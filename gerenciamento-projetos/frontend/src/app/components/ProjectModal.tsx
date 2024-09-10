@@ -20,6 +20,13 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     const [userOptions, setUserOptions] = useState<User[]>([]);
 
+    // Validation states
+    const [nomeError, setNomeError] = useState<string>('');
+    const [descricaoError, setDescricaoError] = useState<string>('');
+    const [dataInicioError, setDataInicioError] = useState<string>('');
+    const [dataFimError, setDataFimError] = useState<string>('');
+    const [statusError, setStatusError] = useState<string>('');
+
     const theme = useTheme();
     const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -32,12 +39,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
             setStatus(project.status);
             fetchProjectUsers(project._id);
         } else {
-            setNome('');
-            setDescricao('');
-            setDataInicio('');
-            setDataFim('');
-            setStatus('');
-            setSelectedUsers([]);
+            resetFields();
         }
     }, [project]);
 
@@ -91,7 +93,40 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
         }
     };
 
+    const validateFields = () => {
+        let valid = true;
+
+        if (!nome.trim()) {
+            setNomeError('Nome é obrigatório');
+            valid = false;
+        }
+
+        if (!descricao.trim()) {
+            setDescricaoError('Descrição é obrigatória');
+            valid = false;
+        }
+
+        if (!dataInicio.trim()) {
+            setDataInicioError('Data de Início é obrigatória');
+            valid = false;
+        }
+
+        if (!dataFim.trim()) {
+            setDataFimError('Data de Encerramento é obrigatória');
+            valid = false;
+        }
+
+        if (!status.trim()) {
+            setStatusError('Status é obrigatório');
+            valid = false;
+        }
+
+        return valid;
+    };
+
     const handleSubmit = async () => {
+        if (!validateFields()) return;
+
         try {
             const payload = {
                 nome,
@@ -112,8 +147,31 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
         }
     };
 
+    const resetFields = () => {
+        setNome('');
+        setDescricao('');
+        setDataInicio('');
+        setDataFim('');
+        setStatus('');
+        setSelectedUsers([]);
+        resetValidationErrors();
+    };
+
+    const resetValidationErrors = () => {
+        setNomeError('');
+        setDescricaoError('');
+        setDataInicioError('');
+        setDataFimError('');
+        setStatusError('');
+    };
+
+    const handleCloseModal = () => {
+        resetFields();
+        handleClose();
+    };
+
     return (
-        <Modal open={open} onClose={handleClose} aria-labelledby="modal-title">
+        <Modal open={open} onClose={handleCloseModal} aria-labelledby="modal-title">
             <Box
                 sx={{
                     position: 'absolute',
@@ -130,29 +188,44 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
                 }}
             >
                 <Typography variant="h6" color='#36454F' gutterBottom>
-                    {project ? 'Editar Projeto' : 'Add Projeto'}
+                    {project ? 'Editar Projeto' : 'Adicionar Projeto'}
                 </Typography>
                 <TextField
                     fullWidth
                     margin="normal"
                     label="Nome"
                     value={nome}
-                    onChange={(e) => setNome(e.target.value)}
+                    onChange={(e) => {
+                        setNome(e.target.value);
+                        if (nomeError) setNomeError('');
+                    }}
+                    error={!!nomeError}
+                    helperText={nomeError}
                 />
                 <TextField
                     fullWidth
                     margin="normal"
                     label="Descrição"
                     value={descricao}
-                    onChange={(e) => setDescricao(e.target.value)}
+                    onChange={(e) => {
+                        setDescricao(e.target.value);
+                        if (descricaoError) setDescricaoError('');
+                    }}
+                    error={!!descricaoError}
+                    helperText={descricaoError}
                 />
                 <TextField
                     fullWidth
                     margin="normal"
-                    label="Data Inicio"
+                    label="Data Início"
                     type="date"
                     value={dataInicio}
-                    onChange={(e) => setDataInicio(e.target.value)}
+                    onChange={(e) => {
+                        setDataInicio(e.target.value);
+                        if (dataInicioError) setDataInicioError('');
+                    }}
+                    error={!!dataInicioError}
+                    helperText={dataInicioError}
                 />
                 <TextField
                     fullWidth
@@ -160,20 +233,30 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
                     label="Data Encerramento"
                     type="date"
                     value={dataFim}
-                    onChange={(e) => setDataFim(e.target.value)}
+                    onChange={(e) => {
+                        setDataFim(e.target.value);
+                        if (dataFimError) setDataFimError('');
+                    }}
+                    error={!!dataFimError}
+                    helperText={dataFimError}
                 />
                 <TextField
                     fullWidth
                     margin="normal"
                     label="Status"
                     value={status}
-                    onChange={(e) => setStatus(e.target.value)}
+                    onChange={(e) => {
+                        setStatus(e.target.value);
+                        if (statusError) setStatusError('');
+                    }}
+                    error={!!statusError}
+                    helperText={statusError}
                 />
                 
                 <Autocomplete
                     options={userOptions}
                     getOptionLabel={(option) => option.nome}
-                    renderInput={(params) => <TextField {...params} label="Add Usuario" />}
+                    renderInput={(params) => <TextField {...params} label="Adicionar Usuário" />}
                     onChange={(event, value) => {
                         if (value) handleAddUser(value);
                     }}
@@ -181,7 +264,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
                 
                 <Box sx={{ mt: 2 }}>
                     <Typography variant="h6" color='#36454F' gutterBottom>
-                       Usuarios no Projeto
+                        Usuários no Projeto
                     </Typography>
                     {selectedUsers.map(user => (
                         <Chip
@@ -199,7 +282,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
                     onClick={handleSubmit}
                     sx={{ mt: 2 }}
                 >
-                    {project ? 'Atualizar Projeto' : 'Add Projeto'}
+                    {project ? 'Atualizar Projeto' : 'Adicionar Projeto'}
                 </Button>
             </Box>
         </Modal>
