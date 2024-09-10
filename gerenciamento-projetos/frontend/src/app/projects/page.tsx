@@ -1,9 +1,18 @@
+'use client';
 import React from 'react';
 import { Box, Typography } from '@mui/material';
 import ProjectTable from '../components/TableProjects';
+import ResponsiveAppBar from '../components/AppBar';
+import Footer from '../components/Footer';
 
 const Projects: React.FC = () => {
     return (
+        <Box sx={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                minHeight: '100vh'}} 
+        >
+        <ResponsiveAppBar />  
         <Box 
             sx={{
                 padding: { xs: 2, sm: 4, md: 6 },
@@ -26,6 +35,8 @@ const Projects: React.FC = () => {
                 Gerenciamento de Projetos
             </Typography>
             <ProjectTable />
+        </Box>
+        <Footer />
         </Box>
     );
 };
