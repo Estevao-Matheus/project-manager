@@ -89,18 +89,18 @@ const ProjectTable: React.FC = () => {
     return (
         <Box sx={{ padding: 2 }}>
             <Button variant="contained" color="primary" onClick={handleAddProject} style={{ margin: 16 }}>
-                Add Project
+                Add Projeto
             </Button>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Description</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Start Date</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>End Date</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Nome</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Descrição</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Data Inicio</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Data Encerramento</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Ações</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>

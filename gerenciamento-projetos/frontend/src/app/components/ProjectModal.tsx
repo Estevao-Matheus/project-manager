@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, TextField, Button, Autocomplete, List, ListItem, ListItemText, IconButton } from '@mui/material';
+import { Modal, Box, TextField, Button, Autocomplete, useMediaQuery, useTheme, Chip, Typography } from '@mui/material';
 import axios from 'axios';
 import { Project } from '../types/Project';
-import { User } from '../types/User';
-import { Delete } from '@mui/icons-material';
+import { User } from '../types/User'; // Import User type
 
 interface ProjectModalProps {
     open: boolean;
@@ -11,31 +10,20 @@ interface ProjectModalProps {
     project: Project | null;
 }
 
-const modalStyle = {
-    position: 'absolute' as 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-};
-
 const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project }) => {
     const [nome, setNome] = useState<string>('');
     const [descricao, setDescricao] = useState<string>('');
     const [dataInicio, setDataInicio] = useState<string>('');
     const [dataFim, setDataFim] = useState<string>('');
     const [status, setStatus] = useState<string>('');
+    const [users, setUsers] = useState<User[]>([]);
+    const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
+    const [userOptions, setUserOptions] = useState<User[]>([]);
 
-    const [allUsers, setAllUsers] = useState<User[]>([]);
-    const [projectUsers, setProjectUsers] = useState<User[]>([]);
-    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const theme = useTheme();
+    const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
     useEffect(() => {
-        fetchUsers();
         if (project) {
             setNome(project.nome);
             setDescricao(project.descricao);
@@ -49,14 +37,18 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
             setDataInicio('');
             setDataFim('');
             setStatus('');
-            setProjectUsers([]);
+            setSelectedUsers([]);
         }
     }, [project]);
 
-    const fetchUsers = async () => {
+    useEffect(() => {
+        fetchAllUsers();
+    }, []);
+
+    const fetchAllUsers = async () => {
         try {
             const response = await axios.get<User[]>('http://localhost:3000/api/auth/users');
-            setAllUsers(response.data);
+            setUserOptions(response.data);
         } catch (error) {
             console.error('Failed to fetch users:', error);
         }
@@ -65,36 +57,36 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
     const fetchProjectUsers = async (projectId: string) => {
         try {
             const response = await axios.get<User[]>(`http://localhost:3000/api/projects/${projectId}/usuarios`);
-            setProjectUsers(response.data);
+            setSelectedUsers(response.data);
         } catch (error) {
             console.error('Failed to fetch project users:', error);
         }
     };
 
-    const handleAddUser = async () => {
-        if (selectedUser && project) {
+    const handleAddUser = async (user: User) => {
+        if (project) {
             try {
                 await axios.post('http://localhost:3000/api/projects/addUser', {
                     projetoId: project._id,
-                    userId: selectedUser._id,
+                    userId: user._id,
                 });
                 fetchProjectUsers(project._id);
             } catch (error) {
-                console.error('Failed to add user to project:', error);
+                console.error('Failed to add user:', error);
             }
         }
     };
 
-    const handleRemoveUser = async (userId: string) => {
+    const handleRemoveUser = async (user: User) => {
         if (project) {
             try {
                 await axios.post('http://localhost:3000/api/projects/removeUser', {
                     projetoId: project._id,
-                    userId,
+                    userId: user._id,
                 });
                 fetchProjectUsers(project._id);
             } catch (error) {
-                console.error('Failed to remove user from project:', error);
+                console.error('Failed to remove user:', error);
             }
         }
     };
@@ -121,8 +113,25 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
     };
 
     return (
-        <Modal open={open} onClose={handleClose}>
-            <Box sx={modalStyle}>
+        <Modal open={open} onClose={handleClose} aria-labelledby="modal-title">
+            <Box
+                sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: isSmallScreen ? '90%' : 600,
+                    maxWidth: '90%',
+                    bgcolor: 'background.paper',
+                    border: '2px solid #000',
+                    boxShadow: 24,
+                    p: 4,
+                    borderRadius: 2,
+                }}
+            >
+                <Typography variant="h6" color='#36454F' gutterBottom>
+                    {project ? 'Editar Projeto' : 'Add Projeto'}
+                </Typography>
                 <TextField
                     fullWidth
                     margin="normal"
@@ -140,7 +149,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
                 <TextField
                     fullWidth
                     margin="normal"
-                    label="Data de Inicio"
+                    label="Data Inicio"
                     type="date"
                     value={dataInicio}
                     onChange={(e) => setDataInicio(e.target.value)}
@@ -148,7 +157,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
                 <TextField
                     fullWidth
                     margin="normal"
-                    label="Data de Encerramento"
+                    label="Data Encerramento"
                     type="date"
                     value={dataFim}
                     onChange={(e) => setDataFim(e.target.value)}
@@ -160,35 +169,37 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
                 />
-
+                
                 <Autocomplete
-                    options={allUsers}
+                    options={userOptions}
                     getOptionLabel={(option) => option.nome}
-                    onChange={(event, newValue) => setSelectedUser(newValue)}
-                    renderInput={(params) => <TextField {...params} label="Adicionar Usuário" />}
-                    sx={{ marginY: 2 }}
+                    renderInput={(params) => <TextField {...params} label="Add Usuario" />}
+                    onChange={(event, value) => {
+                        if (value) handleAddUser(value);
+                    }}
                 />
-                <Button variant="contained" color="primary" onClick={handleAddUser} disabled={!selectedUser}>
-                    Adicionar Usuário ao Projeto
-                </Button>
-
-                <List>
-                    {projectUsers.map((user) => (
-                        <ListItem
+                
+                <Box sx={{ mt: 2 }}>
+                    <Typography variant="h6" color='#36454F' gutterBottom>
+                       Usuarios no Projeto
+                    </Typography>
+                    {selectedUsers.map(user => (
+                        <Chip
                             key={user._id}
-                            secondaryAction={
-                                <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveUser(user._id)}>
-                                    <Delete />
-                                </IconButton>
-                            }
-                        >
-                            <ListItemText primary={user.nome} secondary={user.email} />
-                        </ListItem>
+                            label={user.nome}
+                            onDelete={() => handleRemoveUser(user)}
+                            sx={{ m: 0.5 }}
+                        />
                     ))}
-                </List>
+                </Box>
 
-                <Button variant="contained" color="primary" onClick={handleSubmit} sx={{ marginTop: 2 }}>
-                    {project ? 'Update Project' : 'Add Project'}
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSubmit}
+                    sx={{ mt: 2 }}
+                >
+                    {project ? 'Atualizar Projeto' : 'Add Projeto'}
                 </Button>
             </Box>
         </Modal>
