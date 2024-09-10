@@ -100,9 +100,19 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const listAllUsers = async (req, res) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Falha ao obter os usuarios", error: err.message });
+  }
+};
+
 module.exports = {
   register,
   login,
   logout,
   deleteUser,
+  listAllUsers
 };
