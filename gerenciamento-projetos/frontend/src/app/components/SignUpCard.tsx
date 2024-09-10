@@ -232,7 +232,7 @@ export default function SignUp() {
                   Já Possui uma conta?{' '}
                   <span>
                     <Link
-                      href="/login"
+                      href="/"
                       variant="body2"
                       sx={{ alignSelf: 'center' }}
                     >
