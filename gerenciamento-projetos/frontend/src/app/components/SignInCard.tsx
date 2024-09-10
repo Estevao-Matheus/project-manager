@@ -123,14 +123,14 @@ export default function SignInCard() {
         </FormControl>
         <FormControl>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-            <FormLabel htmlFor="password">Password</FormLabel>
+            <FormLabel htmlFor="password">Senha</FormLabel>
             <Link
               component="button"
               onClick={handleClickOpen}
               variant="body2"
               sx={{ alignSelf: 'baseline' }}
             >
-              Forgot your password?
+              Esqueceu a senha?
             </Link>
           </Box>
           <TextField
@@ -150,25 +150,25 @@ export default function SignInCard() {
         </FormControl>
         <FormControlLabel
           control={<Checkbox value="remember" color="primary" />}
-          label="Remember me"
+          label="Lembrar de mim"
         />
         <Button type="submit" fullWidth variant="contained" onClick={validateInputs}>
           Login
         </Button>
         <Typography sx={{ textAlign: 'center' }}>
-          Don’t have an account?{' '}
+          Não tem uma conta?{' '}
           <span>
             <Link
               href="/register"
               variant="body2"
               sx={{ alignSelf: 'center' }}
             >
-              Sign up
+              Registrar
             </Link>
           </span>
         </Typography>
       </Box>
-      <Divider>or</Divider>
+      <Divider></Divider>
     </Card>
   );
 }

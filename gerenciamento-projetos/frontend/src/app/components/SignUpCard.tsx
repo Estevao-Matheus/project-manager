@@ -2,10 +2,7 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
-import FormControlLabel from '@mui/material/FormControlLabel';
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
@@ -19,6 +16,7 @@ import {
   styled,
   PaletteMode,
 } from '@mui/material/styles';
+import axios from 'axios';
 
 
 
@@ -40,18 +38,6 @@ const Card = styled(MuiCard)(({ theme }) => ({
   }),
 }));
 
-
-const SignUpContainer = styled(Stack)(({ theme }) => ({
-  height: '100%',
-  padding: 4,
-  backgroundImage:
-    'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
-  backgroundRepeat: 'no-repeat',
-  ...theme.applyStyles('dark', {
-    backgroundImage:
-      'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
-  }),
-}));
 
 export default function SignUp() {
   const [mode, setMode] = React.useState<PaletteMode>('light');
@@ -80,15 +66,7 @@ export default function SignUp() {
     }
   }, []);
 
-  const toggleColorMode = () => {
-    const newMode = mode === 'dark' ? 'light' : 'dark';
-    setMode(newMode);
-    localStorage.setItem('themeMode', newMode); // Save the selected mode to localStorage
-  };
 
-  const toggleCustomTheme = () => {
-    setShowCustomTheme((prev) => !prev);
-  };
 
   const validateInputs = () => {
     const email = document.getElementById('email') as HTMLInputElement;
@@ -99,7 +77,7 @@ export default function SignUp() {
 
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
       setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
+      setEmailErrorMessage('por favor, insira um email valido.');
       isValid = false;
     } else {
       setEmailError(false);
@@ -108,7 +86,7 @@ export default function SignUp() {
 
     if (!password.value || password.value.length < 6) {
       setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
+      setPasswordErrorMessage('Password deve ter no minimo 6 caracteres.');
       isValid = false;
     } else {
       setPasswordError(false);
@@ -117,7 +95,7 @@ export default function SignUp() {
 
     if (!name.value || name.value.length < 1) {
       setNameError(true);
-      setNameErrorMessage('Name is required.');
+      setNameErrorMessage('Nome é obrigatório.');
       isValid = false;
     } else {
       setNameError(false);
@@ -127,15 +105,27 @@ export default function SignUp() {
     return isValid;
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (!validateInputs()) return;
+
     const data = new FormData(event.currentTarget);
-    console.log({
-      name: data.get('name'),
-      lastName: data.get('lastName'),
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+
+    try {
+      const response = await axios.post('http://localhost:3000/api/auth/register', {
+        nome: data.get('name'),
+        email: data.get('email'),
+        senha: data.get('password'),
+        papel: data.get('role'),
+      });
+
+      console.log('Usuario registrado com sucesso:', response.data);
+      
+    } catch (error) {
+      console.error('Erro ao registrar usuário:', error);
+     
+    }
   };
 
   return (
@@ -242,7 +232,6 @@ export default function SignUp() {
                 </Typography>
               </Box>
               <Divider>
-                <Typography sx={{ color: 'text.secondary' }}>or</Typography>
               </Divider>
             </Card>
           </Stack>
