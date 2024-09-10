@@ -3,12 +3,16 @@ const mongoose = require("mongoose");
 const Project = require("./models/project.model.js");
 const projectRoute = require("./routes/project.route.js");
 const authRoute = require("./routes/user.route.js");
+const cors = require('cors');
 //import mongoose from 'mongoose';
 
 //Middleware
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors( {
+  origin: 'http://localhost:3001',
+})); 
 
 //routes
 app.use("/api/projects", projectRoute);
