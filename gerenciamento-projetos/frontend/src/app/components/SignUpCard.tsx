@@ -1,5 +1,7 @@
 'use client';
 import * as React from 'react';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Divider from '@mui/material/Divider';
@@ -10,15 +12,8 @@ import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
-import {
-  createTheme,
-  ThemeProvider,
-  styled,
-  PaletteMode,
-} from '@mui/material/styles';
+import { createTheme, PaletteMode, ThemeProvider, styled } from '@mui/material/styles';
 import axios from 'axios';
-
-
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -27,17 +22,14 @@ const Card = styled(MuiCard)(({ theme }) => ({
   width: '100%',
   padding: theme.spacing(4),
   gap: theme.spacing(2),
-  boxShadow:
-    'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
+  boxShadow: 'hsla(220, 30%, 5%, 0.05) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.05) 0px 15px 35px -5px',
   [theme.breakpoints.up('sm')]: {
     width: '450px',
   },
   ...theme.applyStyles('dark', {
-    boxShadow:
-      'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
+    boxShadow: 'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
   }),
 }));
-
 
 export default function SignUp() {
   const [mode, setMode] = React.useState<PaletteMode>('light');
@@ -51,22 +43,16 @@ export default function SignUp() {
   const [nameErrorMessage, setNameErrorMessage] = React.useState('');
   const [roleError, setRoleError] = React.useState(false);
   const [roleErrorMessage, setRoleErrorMessage] = React.useState('');
-  // This code only runs on the client side, to determine the system color preference
+
   React.useEffect(() => {
-    // Check if there is a preferred mode in localStorage
     const savedMode = localStorage.getItem('themeMode') as PaletteMode | null;
     if (savedMode) {
       setMode(savedMode);
     } else {
-      // If no preference is found, it uses system preference
-      const systemPrefersDark = window.matchMedia(
-        '(prefers-color-scheme: dark)',
-      ).matches;
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       setMode(systemPrefersDark ? 'dark' : 'light');
     }
   }, []);
-
-
 
   const validateInputs = () => {
     const email = document.getElementById('email') as HTMLInputElement;
@@ -105,7 +91,7 @@ export default function SignUp() {
     return isValid;
   };
 
-   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     if (!validateInputs()) return;
@@ -120,121 +106,105 @@ export default function SignUp() {
         papel: data.get('role'),
       });
 
-      console.log('Usuario registrado com sucesso:', response.data);
-      
+      if (response.data.created) {
+        toast.success(response.data.msg || 'Usuário criado com sucesso!');
+      } else if (response.data.errors) {
+        Object.keys(response.data.errors).forEach((field) => {
+          if (response.data.errors[field]) {
+            toast.error(response.data.errors[field]);
+          }
+        });
+      }
     } catch (error) {
+      toast.error('Erro ao registrar usuário.');
       console.error('Erro ao registrar usuário:', error);
-     
     }
   };
 
   return (
-        
-          <Stack
-            sx={{
-              justifyContent: 'center',
-              height: '100dvh',
-              p: 2,
-            }}
-          >
-            <Card variant="outlined">
-            
-              <Typography
-                component="h1"
-                variant="h4"
-                sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-              >
-                Cadastrar
-              </Typography>
-              <Box
-                component="form"
-                onSubmit={handleSubmit}
-                sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
-              >
-                <FormControl>
-                  <FormLabel htmlFor="name">Nome Completo</FormLabel>
-                  <TextField
-                    autoComplete="name"
-                    name="name"
-                    required
-                    fullWidth
-                    id="name"
-                    placeholder="Jon Snow"
-                    error={nameError}
-                    helperText={nameErrorMessage}
-                    color={nameError ? 'error' : 'primary'}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel htmlFor="email">Email</FormLabel>
-                  <TextField
-                    required
-                    fullWidth
-                    id="email"
-                    placeholder="your@email.com"
-                    name="email"
-                    autoComplete="email"
-                    variant="outlined"
-                    error={emailError}
-                    helperText={emailErrorMessage}
-                    color={passwordError ? 'error' : 'primary'}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel htmlFor="password">Senha</FormLabel>
-                  <TextField
-                    required
-                    fullWidth
-                    name="password"
-                    placeholder="••••••"
-                    type="password"
-                    id="password"
-                    autoComplete="new-password"
-                    variant="outlined"
-                    error={passwordError}
-                    helperText={passwordErrorMessage}
-                    color={passwordError ? 'error' : 'primary'}
-                  />
-                </FormControl>
-                 <FormControl>
-                  <FormLabel htmlFor="name">Papel</FormLabel>
-                 <TextField
-                    autoComplete="role"
-                    name="role"
-                    required
-                    fullWidth
-                    id="role"
-                    placeholder="Desenvolvedor"
-                    error={nameError}
-                    helperText={roleErrorMessage}
-                    color={roleError ? 'error' : 'primary'}
-                  />
-                  </FormControl>
-                <Button
-                  type="submit"
-                  fullWidth
-                  variant="contained"
-                  onClick={validateInputs}
-                >
-                  Cadastrar
-                </Button>
-                <Typography sx={{ textAlign: 'center' }}>
-                  Já Possui uma conta?{' '}
-                  <span>
-                    <Link
-                      href="/"
-                      variant="body2"
-                      sx={{ alignSelf: 'center' }}
-                    >
-                     Login
-                    </Link>
-                  </span>
-                </Typography>
-              </Box>
-              <Divider>
-              </Divider>
-            </Card>
-          </Stack>
-        
+    
+      
+      <Stack sx={{ justifyContent: 'center', height: '100dvh', p: 2 }}>
+        <ToastContainer />
+        <Card variant="outlined">
+          <Typography component="h1" variant="h4" sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}>
+            Cadastrar
+          </Typography>
+          <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <FormControl>
+              <FormLabel htmlFor="name">Nome Completo</FormLabel>
+              <TextField
+                autoComplete="name"
+                name="name"
+                required
+                fullWidth
+                id="name"
+                placeholder="Jon Snow"
+                error={nameError}
+                helperText={nameErrorMessage}
+                color={nameError ? 'error' : 'primary'}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="email">Email</FormLabel>
+              <TextField
+                required
+                fullWidth
+                id="email"
+                placeholder="your@email.com"
+                name="email"
+                autoComplete="email"
+                variant="outlined"
+                error={emailError}
+                helperText={emailErrorMessage}
+                color={passwordError ? 'error' : 'primary'}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="password">Senha</FormLabel>
+              <TextField
+                required
+                fullWidth
+                name="password"
+                placeholder="••••••"
+                type="password"
+                id="password"
+                autoComplete="new-password"
+                variant="outlined"
+                error={passwordError}
+                helperText={passwordErrorMessage}
+                color={passwordError ? 'error' : 'primary'}
+              />
+            </FormControl>
+            <FormControl>
+              <FormLabel htmlFor="role">Papel</FormLabel>
+              <TextField
+                autoComplete="role"
+                name="role"
+                required
+                fullWidth
+                id="role"
+                placeholder="Desenvolvedor"
+                error={roleError}
+                helperText={roleErrorMessage}
+                color={roleError ? 'error' : 'primary'}
+              />
+            </FormControl>
+            <Button type="submit" fullWidth variant="contained">
+              Cadastrar
+            </Button>
+            <Typography sx={{ textAlign: 'center' }}>
+              Já Possui uma conta?{' '}
+              <span>
+                <Link href="/" variant="body2" sx={{ alignSelf: 'center' }}>
+                  Login
+                </Link>
+              </span>
+            </Typography>
+          </Box>
+          <Divider />
+        </Card>
+      </Stack>
+    
   );
 }
