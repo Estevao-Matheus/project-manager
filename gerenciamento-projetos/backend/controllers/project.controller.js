@@ -28,8 +28,17 @@ const getProject = async (req, res) => {
 
 const createProject = async (req, res) => {
   try {
+    const { status } = req.body;
+    if (!["Em andamento", "Concluído", "Pendente"].includes(status)) {
+      return res
+        .status(400)
+        .json({ message: "Status inválido. Use: 'Em andamento', 'Concluído', 'Pendente'" });
+    }
+
     const project = await Project.create(req.body);
-    res.status(200).json(project);
+    res
+      .status(200)
+      .json({ message: 'Projeto criado com sucesso! API', project });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -38,18 +47,23 @@ const createProject = async (req, res) => {
 const updateProject = async (req, res) => {
   try {
     const { id } = req.params;
-
-    const project = await Project.findByIdAndUpdate(id, req.body);
-
-    if (!project) {
-      return res.status(404).json({ message: "projeto não encontrado" });
+    const { status } = req.body;
+    
+    if (status && !["Em andamento", "Concluído", "Pendente"].includes(status)) {
+      return res
+        .status(400)
+        .json({ message: "Status inválido. Use: 'Em andamento', 'Concluído', 'Pendente'" });
     }
 
-    const updatedProject = await Project.findById(id);
+    const project = await Project.findByIdAndUpdate(id, req.body, { new: true });
 
-    res.status(200).json(updatedProject);
+    if (!project) {
+      return res.status(404).json({ message: "Projeto não encontrado" });
+    }
+
+    res.status(200).json({ message: 'Projeto atualizado com sucesso! API', project });
   } catch (error) {
-    rest.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -57,15 +71,22 @@ const deleteProject = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const project = await Project.findByIdAndDelete(id);
+    const project = await Project.findById(id);
 
     if (!project) {
-      return res.status(404).json({ message: "projeto não encontrado" });
+      return res.status(404).json({ message: "Projeto não encontrado" });
+    }
+    if (project.status !== "Concluído") {
+      return res
+        .status(400)
+        .json({ message: "Somente projetos 'Concluídos' podem ser deletados" });
     }
 
-    res.status(200).json("Projeto deletado com sucesso!");
+    await Project.findByIdAndDelete(id);
+
+    res.status(200).json({ message: "Projeto deletado com sucesso! API" });
   } catch (error) {
-    rest.status(500).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 

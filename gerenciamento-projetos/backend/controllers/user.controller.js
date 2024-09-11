@@ -72,7 +72,11 @@ const login = async (req, res) => {
     res.set('jwt', token);
     res.set('Access-Control-Expose-Headers','jwt')
 
-    res.status(200).json({ user: user._id, status: true });
+    res.status(200).json({ 
+      message: 'Login realizado com sucesso! API',	
+      user: user._id, 
+      status: true 
+    });
   } catch (err) {
     const errors = handleErrors(err);
     res.status(400).json({ errors, status: false });

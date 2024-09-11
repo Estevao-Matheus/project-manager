@@ -3,11 +3,11 @@ const mongoose = require("mongoose");
 const ProjectSchema = mongoose.Schema({
   nome: {
     type: String,
-    required: [true, "Por favor digite o nome do produto!"],
+    required: [true, "Por favor digite o nome do projeto!"],
   },
   descricao: {
     type: String,
-    required: [true, "Por favor descreva o produto!"],
+    required: [true, "Por favor descreva o projeto!"],
   },
   data_inicio: {
     type: Date,
