@@ -60,15 +60,17 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, senha } = req.body;
-
+  console.log(email, senha);
   try {
     const user = await User.login(email, senha);
     const token = createToken(user._id);
 
-    res.cookie("jwt", token, {
-      httpOnly: true,
-      maxAge: maxAge * 1000,
-    });
+    // res.cookie("jwt", token, {
+    //   httpOnly: true,
+    //   maxAge: maxAge * 1000,
+    // });
+    res.set('jwt', token);
+    res.set('Access-Control-Expose-Headers','jwt')
 
     res.status(200).json({ user: user._id, status: true });
   } catch (err) {

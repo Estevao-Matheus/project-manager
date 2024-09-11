@@ -1,5 +1,9 @@
 'use client';
 import * as React from 'react';
+
+import { toast } from 'react-toastify';
+
+// Existing imports
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import MuiCard from '@mui/material/Card';
@@ -11,10 +15,9 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Link from '@mui/material/Link';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-
 import { styled } from '@mui/material/styles';
-//import { styled } from "@mui/styled-engine";
-
+//import {cookies} from 'next/headers';	
+import axios from 'axios';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -34,7 +37,6 @@ const Card = styled(MuiCard)(({ theme }) => ({
   }),
 }));
 
-
 export default function SignInCard() {
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
@@ -50,24 +52,47 @@ export default function SignInCard() {
     setOpen(false);
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+  const handleSubmit = async (event) => {
+  event.preventDefault();
+
+  if (!validateInputs()) return; // Ensure inputs are valid before submitting
+
+  const data = new FormData(event.currentTarget);
+  const email = data.get('email');
+  const senha = data.get('senha');
+
+  try {
+    const response = await axios.post('http://localhost:3000/api/auth/login', {
+      email,
+      senha,
     });
-  };
+    const token = response.headers['jwt'];
+    //cookies().set('Authorization', "Bearer " + token,  { httpOnly: true })
+    if (response.status === 200) {
+      toast.success('Login realizado com sucesso');
+      window.location.href = '/projects'; 
+    } else {
+      toast.error(response.data.errors || 'Login falhou, por favor tente novamente.');
+      setEmailError(true);
+      setEmailErrorMessage(response.data.errors.email || '');
+      setPasswordError(true);
+      setPasswordErrorMessage(response.data.errors.senha || '');
+    }
+  } catch (error) {
+    toast.error('Ocorreu um erro por favor tente novamente.');
+    console.error('Login failed:', error);
+  }
+};
 
   const validateInputs = () => {
     const email = document.getElementById('email');
-    const password = document.getElementById('password');
+    const password = document.getElementById('senha');
 
     let isValid = true;
 
     if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
       setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
+      setEmailErrorMessage('Por favor entre com um email valido.');
       isValid = false;
     } else {
       setEmailError(false);
@@ -76,7 +101,7 @@ export default function SignInCard() {
 
     if (!password.value || password.value.length < 6) {
       setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
+      setPasswordErrorMessage('Senha com 6 digitos no minimo.');
       isValid = false;
     } else {
       setPasswordError(false);
@@ -136,10 +161,10 @@ export default function SignInCard() {
           <TextField
             error={passwordError}
             helperText={passwordErrorMessage}
-            name="password"
+            name="senha"
             placeholder="••••••"
             type="password"
-            id="password"
+            id="senha"
             autoComplete="current-password"
             autoFocus
             required
