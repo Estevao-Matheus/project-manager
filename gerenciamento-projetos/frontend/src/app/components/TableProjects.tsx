@@ -7,6 +7,7 @@ import ProjectModal from './ProjectModal';
 import DeleteModal from './DeleteModal';
 import { Project } from '../types/Project';
 import { User } from '../types/User';
+import {toast} from 'react-toastify';
 
 const ProjectTable: React.FC = () => {
     const [projects, setProjects] = useState<Project[]>([]);
@@ -62,12 +63,16 @@ const ProjectTable: React.FC = () => {
     const handleDeleteProject = async () => {
         if (projectToDelete) {
             try {
-                await axios.delete(`http://localhost:3000/api/projects/${projectToDelete._id}`);
+                 const response = await axios.delete(`http://localhost:3000/api/projects/${projectToDelete._id}`);
+                 toast.success(response.data.message || 'Projeto excluído com sucesso!');
                 fetchProjects(); 
                 setOpenDeleteModal(false);
-            } catch (error) {
-                console.error('Failed to delete the project:', error);
-            }
+            }catch (error) {
+            const errorMessage = error.response?.data?.message || 'Falha ao excluir o projeto!';
+            console.error('Failed to delete the project:', errorMessage);
+            toast.error(errorMessage);
+            setOpenDeleteModal(false);
+        }
         }
     };
 

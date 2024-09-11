@@ -69,7 +69,7 @@ export default function SignInCard() {
     const token = response.headers['jwt'];
     //cookies().set('Authorization', "Bearer " + token,  { httpOnly: true })
     if (response.status === 200) {
-      toast.success('Login realizado com sucesso');
+      toast.success(response.data.message || 'Login realizado com sucesso');
       window.location.href = '/projects'; 
     } else {
       toast.error(response.data.errors || 'Login falhou, por favor tente novamente.');

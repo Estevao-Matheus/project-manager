@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Box, TextField, Button, Autocomplete, useMediaQuery, useTheme, Chip, Typography } from '@mui/material';
+import { Modal, Box, TextField, Button, Autocomplete, useMediaQuery, useTheme, Chip, Typography, responsiveFontSizes } from '@mui/material';
 import axios from 'axios';
 import { Project } from '../types/Project';
-import { User } from '../types/User'; // Import User type
+import { User } from '../types/User'; 
+import { toast } from 'react-toastify';
 
 interface ProjectModalProps {
     open: boolean;
@@ -125,27 +126,31 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
     };
 
     const handleSubmit = async () => {
-        if (!validateFields()) return;
+    if (!validateFields()) return;
 
-        try {
-            const payload = {
-                nome,
-                descricao,
-                data_inicio: new Date(dataInicio).toISOString(),
-                data_fim: new Date(dataFim).toISOString(),
-                status,
-            };
+    try {
+        const payload = {
+            nome,
+            descricao,
+            data_inicio: new Date(dataInicio).toISOString(),
+            data_fim: new Date(dataFim).toISOString(),
+            status,
+        };
 
-            if (project) {
-                await axios.put(`http://localhost:3000/api/projects/${project._id}`, payload);
-            } else {
-                await axios.post('http://localhost:3000/api/projects', payload);
-            }
-            handleClose();
-        } catch (error) {
-            console.error('Failed to save project:', error);
+        if (project) {
+            const response = await axios.put(`http://localhost:3000/api/projects/${project._id}`, payload);
+            toast.success( response.data.message || 'Projeto atualizado com sucesso!');
+        } else {
+           const response = await axios.post('http://localhost:3000/api/projects', payload);
+            toast.success( response.data.message ||'Projeto adicionado com sucesso!');
         }
-    };
+        handleClose();
+    } catch (error) {
+            const errorMessage = error.response?.data?.message || 'Falha ao excluir o projeto!';
+            console.error('Failed to delete the project:', errorMessage);
+            toast.error(errorMessage);
+        }
+};
 
     const resetFields = () => {
         setNome('');
