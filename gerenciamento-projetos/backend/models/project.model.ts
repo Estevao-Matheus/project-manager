@@ -1,6 +1,15 @@
-const mongoose = require("mongoose");
+import mongoose, { Document, Schema } from "mongoose";
 
-const ProjectSchema = mongoose.Schema({
+export interface IProject extends Document {
+  nome: string;
+  descricao: string;
+  data_inicio: Date;
+  data_fim: Date;
+  status: "Em andamento" | "Concluído" | "Pendente";
+}
+
+// Define the project schema
+const ProjectSchema: Schema<IProject> = new Schema({
   nome: {
     type: String,
     required: [true, "Por favor digite o nome do projeto!"],
@@ -24,6 +33,6 @@ const ProjectSchema = mongoose.Schema({
   },
 });
 
-const Project = mongoose.model("Project", ProjectSchema);
+const Project = mongoose.model<IProject>("Project", ProjectSchema);
 
-module.exports = Project;
+export default Project;

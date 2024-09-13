@@ -1,96 +1,100 @@
-const Project = require("../models/project.model.js");
-const User = require("../models/user.model.js");
-const ProjetosUsuarios = require("../models/projectUser.model.js");
+import { Request, Response } from "express";
+import Project from "../models/project.model";
+import ProjetosUsuarios from "../models/projectUser.model";
 
-const getProjects = async (req, res) => {
+export const getProjects = async (req: Request, res: Response): Promise<void> => {
   try {
     const projects = await Project.find({});
     res.status(200).json(projects);
-  } catch (error) {
-    rest.status(500).json({ message: error.message });
+  } catch (error : any) {
+    res.status(500).json({ message: error.message });
   }
 };
 
-const getProject = async (req, res) => {
+export const getProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
     const project = await Project.findById(id);
 
     if (!project) {
-      return res.status(404).json({ message: "projeto não encontrado" });
+       res.status(404).json({ message: "Projeto não encontrado" });
+       return;
     }
     res.status(200).json(project);
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
 
-const createProject = async (req, res) => {
+export const createProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const { status } = req.body;
     if (!["Em andamento", "Concluído", "Pendente"].includes(status)) {
-      return res
+       res
         .status(400)
         .json({ message: "Status inválido. Use: 'Em andamento', 'Concluído', 'Pendente'" });
+      return;
     }
 
     const project = await Project.create(req.body);
-    res
-      .status(200)
-      .json({ message: 'Projeto criado com sucesso! API', project });
-  } catch (error) {
+    res.status(200).json({ message: "Projeto criado com sucesso!API", project });
+  } catch (error : any) {
     res.status(500).json({ message: error.message });
   }
 };
 
-const updateProject = async (req, res) => {
+export const updateProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { status } = req.body;
     
     if (status && !["Em andamento", "Concluído", "Pendente"].includes(status)) {
-      return res
+       res
         .status(400)
         .json({ message: "Status inválido. Use: 'Em andamento', 'Concluído', 'Pendente'" });
+       return;
     }
 
     const project = await Project.findByIdAndUpdate(id, req.body, { new: true });
 
     if (!project) {
-      return res.status(404).json({ message: "Projeto não encontrado" });
+       res.status(404).json({ message: "Projeto não encontrado" });
+       return;
     }
 
-    res.status(200).json({ message: 'Projeto atualizado com sucesso! API', project });
-  } catch (error) {
+    res.status(200).json({ message: "Projeto atualizado com sucesso! API", project });
+  } catch (error : any) {
     res.status(500).json({ message: error.message });
   }
 };
 
-const deleteProject = async (req, res) => {
+export const deleteProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
 
     const project = await Project.findById(id);
 
     if (!project) {
-      return res.status(404).json({ message: "Projeto não encontrado" });
+       res.status(404).json({ message: "Projeto não encontrado" })
+       return;
     }
     if (project.status !== "Concluído") {
-      return res
+       res
         .status(400)
         .json({ message: "Somente projetos 'Concluídos' podem ser deletados" });
+       return;
     }
 
     await Project.findByIdAndDelete(id);
 
     res.status(200).json({ message: "Projeto deletado com sucesso! API" });
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
 };
 
-const addUserToProject = async (req, res) => {
+export const addUserToProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const { projetoId, userId } = req.body;
 
@@ -99,9 +103,10 @@ const addUserToProject = async (req, res) => {
       usuario_id: userId,
     });
     if (existingRelation) {
-      return res
+       res
         .status(400)
         .json({ message: "Usuário já está associado a este projeto" });
+       return;
     }
 
     const newRelation = new ProjetosUsuarios({
@@ -111,12 +116,12 @@ const addUserToProject = async (req, res) => {
     await newRelation.save();
 
     res.status(200).json(newRelation);
-  } catch (err) {
+  } catch (err : any) {
     res.status(500).json({ message: err.message });
   }
 };
 
-const removeUserFromProject = async (req, res) => {
+export const removeUserFromProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const { projetoId, userId } = req.body;
 
@@ -125,16 +130,17 @@ const removeUserFromProject = async (req, res) => {
       usuario_id: userId,
     });
     if (!relation) {
-      return res.status(404).json({ message: "Relação não encontrada" });
+       res.status(404).json({ message: "Relação não encontrada" });
+       return;
     }
 
     res.status(200).json({ message: "Usuário removido do projeto" });
-  } catch (err) {
+  } catch (err : any) {
     res.status(500).json({ message: err.message });
   }
 };
 
-const listUsersInProject = async (req, res) => {
+export const listUsersInProject = async (req: Request, res: Response): Promise<void> => {
   try {
     const { projetoId } = req.params;
 
@@ -144,18 +150,7 @@ const listUsersInProject = async (req, res) => {
     const users = relations.map((relation) => relation.usuario_id);
 
     res.status(200).json(users);
-  } catch (err) {
+  } catch (err : any) {
     res.status(500).json({ message: err.message });
   }
-};
-
-module.exports = {
-  getProjects,
-  getProject,
-  createProject,
-  updateProject,
-  deleteProject,
-  addUserToProject,
-  removeUserFromProject,
-  listUsersInProject,
 };

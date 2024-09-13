@@ -1,10 +1,9 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const Project = require("./models/project.model.js");
-const projectRoute = require("./routes/project.route.js");
-const authRoute = require("./routes/user.route.js");
-const cors = require('cors');
-//import mongoose from 'mongoose';
+import express, { Request, Response } from "express";
+import mongoose from "mongoose";
+import projectRoute from "./routes/project.route";
+import authRoute from "./routes/user.route";
+import cors from "cors";
+
 
 //Middleware
 const app = express();
@@ -22,7 +21,7 @@ app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
 
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
   res.send("Hello from Node API test");
 });
 

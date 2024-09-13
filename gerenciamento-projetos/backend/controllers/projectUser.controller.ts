@@ -1,9 +1,8 @@
-const ProjectUser = require("../models/projectUserModel");
-const User = require("../models/userModel");
-const Project = require("../models/projectModel");
+import { Request, Response } from "express";
+import ProjectUser, { IProjectUser } from "../models/projectUserModel"; 
 
-// Add a user to a project
-module.exports.addUserToProject = async (req, res) => {
+
+export const addUserToProject = async (req: Request, res: Response): Promise<void> => {
   const { usuario_id, projeto_id } = req.body;
 
   try {
@@ -18,8 +17,8 @@ module.exports.addUserToProject = async (req, res) => {
   }
 };
 
-// Remove a user from a project
-module.exports.removeUserFromProject = async (req, res) => {
+
+export const removeUserFromProject = async (req: Request, res: Response): Promise<void> => {
   const { usuario_id, projeto_id } = req.body;
 
   try {
@@ -34,8 +33,8 @@ module.exports.removeUserFromProject = async (req, res) => {
   }
 };
 
-// Get all users related to a specific project
-module.exports.getUsersByProject = async (req, res) => {
+
+export const getUsersByProject = async (req: Request, res: Response): Promise<void> => {
   const { projectId } = req.params;
 
   try {
