@@ -121,3 +121,24 @@ export const listAllUsers = async (req: Request, res: Response): Promise<void> =
     res.status(500).json({ message: "Falha ao obter os usuarios", error: err.message });
   }
 };
+
+export const listAllUsersPaginated = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+
+    const users = await User.find({})
+      .skip(skip)
+      .limit(limit);
+
+    const totalUsers = await User.countDocuments();
+
+    res.status(200).json({ users, totalUsers, totalPages: Math.ceil(totalUsers / limit), currentPage: page });
+  } catch (error: any) {
+    res.status(500).json({ message: "erro na consulta de paginação ", error: error.message });
+
+  }
+}
+
+

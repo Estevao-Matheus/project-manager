@@ -4,7 +4,8 @@ import {
   logout,
   register,
   deleteUser,
-  listAllUsers
+  listAllUsers,
+  listAllUsersPaginated
 } from "../controllers/user.controller";
 
 
@@ -16,5 +17,6 @@ router.post("/login", login);
 router.get("/logout", logout);
 router.delete("/user/delete/:id", deleteUser);
 router.get("/users", listAllUsers);
+router.get("/users/paginated", listAllUsersPaginated);
 
 export default router;
