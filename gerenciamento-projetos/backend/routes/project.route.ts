@@ -8,6 +8,8 @@ import {
   addUserToProject,
   removeUserFromProject,
   listUsersInProject,
+  getProjectsPaginated,
+  getProjectsByStatus
 } from "../controllers/project.controller";
 
 const router: Router = express.Router();
@@ -30,6 +32,10 @@ router.post("/", (req: Request, res: Response) => createProject(req, res));
 
 router.get("/", (req: Request, res: Response) => getProjects(req, res));
 
+router.get('/paginated', (req: Request, res: Response) => getProjectsPaginated(req, res));
+
+router.get("/status-count", getProjectsByStatus);
+
 router.get("/:id", (req: Request, res: Response) => getProject(req, res));
 
 router.put("/:id", (req: Request, res: Response) => updateProject(req, res));
@@ -41,5 +47,6 @@ router.post("/addUser", (req: AddUserRequest, res: Response) => addUserToProject
 router.post("/removeUser", (req: RemoveUserRequest, res: Response) => removeUserFromProject(req, res));
 
 router.get("/:projetoId/usuarios", (req: Request, res: Response) => listUsersInProject(req, res));
+
 
 export default router;
