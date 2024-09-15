@@ -14,9 +14,8 @@ const createToken = (id: any): string => {
 
 interface ErrorWithCode extends Error {
   code?: number;
-  errors?: any; // Use `any` for simplicity
+  errors?: any;
 }
-
 const handleErrors = (err: ErrorWithCode) => {
   let errors: { [key: string]: string } = { email: "", senha: "" };
 
@@ -77,8 +76,16 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     const user: IUser = await User.login(email, senha);
     const token = createToken(user._id);
 
-    res.set('jwt', token);
-    res.set('Access-Control-Expose-Headers', 'jwt');
+    res.cookie("jwt", token, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV !== 'development', // Set to true in production
+      sameSite: 'strict',
+      maxAge: maxAge * 1000
+    })
+
+    res.set("Access-Control-Allow-Credentials", "true");
+    // res.set('jwt', token);
+    // res.set('Access-Control-Expose-Headers', 'jwt');
 
     res.status(200).json({
       message: "Login realizado com sucesso! API",
@@ -141,4 +148,18 @@ export const listAllUsersPaginated = async (req: Request, res: Response): Promis
   }
 }
 
-
+export const getUsersByRole = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const result = await User.aggregate([
+      {
+        $group: {
+          _id: "$papel",
+          count: { $sum: 1 },
+        },
+      },
+    ])
+    res.status(200).json(result);
+  } catch (err: any) {
+    res.status(500).json({ message: "Falha ao obter os usuarios", error: err.message });
+  }
+};

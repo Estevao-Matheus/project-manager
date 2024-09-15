@@ -1,7 +1,6 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 import bcrypt from "bcrypt";
 
-// Define the user interface
 export interface IUser extends Document {
   nome: string;
   email: string;
@@ -9,12 +8,11 @@ export interface IUser extends Document {
   papel: "Desenvolvedor" | "Administrador" | "Usuário";
 }
 
-// Define static methods for the user model
+
 interface IUserModel extends Model<IUser> {
   login(email: string, senha: string): Promise<IUser>;
 }
 
-// Define the user schema
 const UserSchema: Schema<IUser> = new Schema({
   nome: {
     type: String,
@@ -36,7 +34,7 @@ const UserSchema: Schema<IUser> = new Schema({
   },
 });
 
-// Pre-save hook to hash password before saving
+
 UserSchema.pre<IUser>("save", async function (next) {
   if (!this.isModified("senha")) return next();
 
@@ -45,7 +43,7 @@ UserSchema.pre<IUser>("save", async function (next) {
   next();
 });
 
-// Static method for logging in a user
+
 UserSchema.statics.login = async function (email: string, senha: string): Promise<IUser> {
   const user = await this.findOne({ email });
   if (user) {
@@ -58,6 +56,6 @@ UserSchema.statics.login = async function (email: string, senha: string): Promis
   throw new Error("email incorreto");
 };
 
-// Export the User model
+
 const User = mongoose.model<IUser, IUserModel>("User", UserSchema);
 export default User;

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import ProjectUser, { IProjectUser } from "../models/projectUserModel"; 
+import ProjectUser, { IProjectUser } from "../models/projectUserModel";
 
 
 export const addUserToProject = async (req: Request, res: Response): Promise<void> => {
