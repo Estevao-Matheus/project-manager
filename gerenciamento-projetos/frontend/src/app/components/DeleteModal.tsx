@@ -24,10 +24,10 @@ const ConfirmDeleteModal: React.FC<ConfirmDeleteModalProps> = ({ open, onClose, 
     return (
         <Modal open={open} onClose={onClose}>
             <Box  sx={modalStyle}>
-                <Typography variant="h6"  color='black' sx={{ fontWeight: 'bold' }}>
+                <Typography variant="h6"  color='white' sx={{ fontWeight: 'bold' }}>
                     Confirmar Exclusão
                 </Typography>
-                <Typography variant="body1" color='black' >
+                <Typography variant="body1" color='white' >
                    Tem certeza que quer excluir o projeto: "{projectName}"? Essa ação não pode ser revertida.
                 </Typography>
                 <Box display="flex" justifyContent="space-between" mt={2}>

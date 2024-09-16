@@ -1,4 +1,4 @@
-'use client';
+'use client'; 
 import * as React from 'react';
 
 import { toast } from 'react-toastify';
@@ -18,7 +18,6 @@ import Typography from '@mui/material/Typography';
 import { styled } from '@mui/material/styles';
 //import {cookies} from 'next/headers';	
 import axios from 'axios';
-
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -65,9 +64,10 @@ export default function SignInCard() {
     const response = await axios.post('http://localhost:3000/api/auth/login', {
       email,
       senha,
+    }, {
+        withCredentials: true,
     });
     const token = response.headers['jwt'];
-    //cookies().set('Authorization', "Bearer " + token,  { httpOnly: true })
     if (response.status === 200) {
       toast.success(response.data.message || 'Login realizado com sucesso');
       window.location.href = '/projects'; 

@@ -1,26 +1,39 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Typography, Box } from '@mui/material';
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
+import { Box, Button, TextField, IconButton, MenuItem } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import ProjectModal from './ProjectModal';
 import DeleteModal from './DeleteModal';
 import { Project } from '../types/Project';
 import { User } from '../types/User';
-import {toast} from 'react-toastify';
+import { toast } from 'react-toastify';
+import { formatDateFromServer } from '../Helpers/dateHelpers';
 
 const ProjectTable: React.FC = () => {
     const [projects, setProjects] = useState<Project[]>([]);
+    const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
     const [open, setOpen] = useState(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
     const [users, setUsers] = useState<User[]>([]);
+    const [filters, setFilters] = useState({
+        nome: '',
+        dataInicio: '',
+        dataFim: '',
+        status: ''
+    });
 
     useEffect(() => {
         fetchProjects();
         fetchUsers();
     }, []);
+
+    useEffect(() => {
+        applyFilters();
+    }, [projects, filters]);
 
     const fetchProjects = async () => {
         try {
@@ -40,14 +53,34 @@ const ProjectTable: React.FC = () => {
         }
     };
 
-     const fetchProjectUsers = async (projectId: string) => {
-        try {
-            const response = await axios.get<User[]>(`http://localhost:3000/api/projects/${projectId}/usuarios`);
-            return response.data.map(user => user.nome).join(', ');
-        } catch (error) {
-            console.error('Failed to fetch project users:', error);
-            return '';
+    const applyFilters = () => {
+        let filtered = [...projects];
+
+        if (filters.nome) {
+            filtered = filtered.filter((project) =>
+                project.nome.toLowerCase().includes(filters.nome.toLowerCase())
+            );
         }
+
+        if (filters.dataInicio) {
+            filtered = filtered.filter((project) =>
+                new Date(project.data_inicio).toLocaleDateString('pt-BR') === new Date(filters.dataInicio).toLocaleDateString('pt-BR')
+            );
+        }
+
+        if (filters.dataFim) {
+            filtered = filtered.filter((project) =>
+                new Date(project.data_fim).toLocaleDateString('pt-BR') === new Date(filters.dataFim).toLocaleDateString('pt-BR')
+            );
+        }
+
+        if (filters.status) {
+            filtered = filtered.filter((project) =>
+                project.status.toLowerCase() === filters.status.toLowerCase()
+            );
+        }
+
+        setFilteredProjects(filtered);
     };
 
     const handleAddProject = () => {
@@ -63,16 +96,16 @@ const ProjectTable: React.FC = () => {
     const handleDeleteProject = async () => {
         if (projectToDelete) {
             try {
-                 const response = await axios.delete(`http://localhost:3000/api/projects/${projectToDelete._id}`);
-                 toast.success(response.data.message || 'Projeto excluído com sucesso!');
-                fetchProjects(); 
+                const response = await axios.delete(`http://localhost:3000/api/projects/${projectToDelete._id}`);
+                toast.success(response.data.message || 'Projeto excluído com sucesso!');
+                fetchProjects();
                 setOpenDeleteModal(false);
-            }catch (error) {
-            const errorMessage = error.response?.data?.message || 'Falha ao excluir o projeto!';
-            console.error('Failed to delete the project:', errorMessage);
-            toast.error(errorMessage);
-            setOpenDeleteModal(false);
-        }
+            } catch (error) {
+                const errorMessage = error.response?.data?.message || 'Falha ao excluir o projeto!';
+                console.error('Failed to delete the project:', errorMessage);
+                toast.error(errorMessage);
+                setOpenDeleteModal(false);
+            }
         }
     };
 
@@ -88,53 +121,82 @@ const ProjectTable: React.FC = () => {
 
     const handleModalClose = () => {
         setOpen(false);
-        fetchProjects(); 
+        fetchProjects();
     };
+
+
+    const columns: GridColDef[] = [
+        { field: 'nome', headerName: 'Nome', flex: 1 },
+        { field: 'descricao', headerName: 'Descrição', flex: 1 },
+        { field: 'data_inicio', headerName: 'Data Início', flex: 1 },
+        { field: 'data_fim', headerName: 'Data Fim', flex: 1 },
+        { field: 'status', headerName: 'Status', flex: 1 },
+        {
+            field: 'acoes',
+            headerName: 'Ações',
+            flex: 0.5,
+            renderCell: (params) => (
+                <>
+                    <IconButton onClick={() => handleEditProject(params.row)}>
+                        <Edit />
+                    </IconButton>
+                    <IconButton onClick={() => handleOpenDeleteModal(params.row)}>
+                        <Delete />
+                    </IconButton>
+                </>
+            ),
+        },
+    ];
 
     return (
         <Box sx={{ padding: 2 }}>
-            <Button variant="contained" color="primary" onClick={handleAddProject} style={{ margin: 16 }}>
+            <Button variant="contained" color="primary" onClick={handleAddProject} style={{ marginBottom: 16 }}>
                 Add Projeto
             </Button>
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Nome</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Descrição</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Data Inicio</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Data Encerramento</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Status</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold' }}>Ações</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {projects.map((project) => (
-                            <TableRow key={project._id}>
-                                <TableCell>{project.nome}</TableCell>
-                                <TableCell>{project.descricao}</TableCell>
-                                <TableCell>{new Date(project.data_inicio).toLocaleDateString()}</TableCell>
-                                <TableCell>{new Date(project.data_fim).toLocaleDateString()}</TableCell>
-                                <TableCell>{project.status}</TableCell>
-                                <TableCell>
-                                    <Button onClick={() => handleEditProject(project)}>
-                                        <Edit />
-                                    </Button>
-                                    <Button onClick={() => handleOpenDeleteModal(project)}>
-                                        <Delete />
-                                    </Button>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            <ProjectModal 
-                open={open} 
-                handleClose={handleModalClose} 
-                project={selectedProject} 
-                allUsers={users}
-            />
+            <Box display="flex" gap={2} mb={2}>
+                <TextField
+                    label="Nome"
+                    variant="outlined"
+                    value={filters.nome}
+                    onChange={(e) => setFilters({ ...filters, nome: e.target.value })}
+                />
+                <TextField
+                    label="Data Início"
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                    onChange={(e) => setFilters({ ...filters, dataInicio: e.target.value })}
+                />
+                <TextField
+                    label="Data Encerramento"
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                    onChange={(e) => setFilters({ ...filters, dataFim: e.target.value })}
+                />
+                <TextField
+                    select
+                    label="Status"
+                    variant="outlined"
+                    value={filters.status}
+                    onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                    style={{ width: 200 }}
+                >
+                    <MenuItem value="">Todos</MenuItem>
+                    <MenuItem value="Em andamento">Em andamento</MenuItem>
+                    <MenuItem value="Concluído">Concluído</MenuItem>
+                    <MenuItem value="Pendente">Pendente</MenuItem>
+                </TextField>
+            </Box>
+            <Box sx={{ width: '60vw' }}>
+                <DataGrid
+                    rows={filteredProjects}
+                    columns={columns}
+                    pageSize={10}
+                    rowsPerPageOptions={[10]}
+                    getRowId={(row) => row._id}
+                    autoHeight
+                />
+            </Box>
+            <ProjectModal open={open} handleClose={handleModalClose} project={selectedProject} allUsers={users} />
             <DeleteModal
                 open={openDeleteModal}
                 onClose={handleCloseDeleteModal}
