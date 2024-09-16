@@ -3,12 +3,14 @@ import mongoose from "mongoose";
 import projectRoute from "./routes/project.route";
 import authRoute from "./routes/user.route";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 
 //Middleware
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 app.use(cors({
   origin: 'http://localhost:3001',
   credentials: true

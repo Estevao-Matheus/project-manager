@@ -120,6 +120,25 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
   }
 };
 
+export const updateUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.params.id;
+    const { nome, email, senha, papel } = req.body;
+
+    const user = await User.findByIdAndUpdate(userId, req.body, { new: true });
+
+    if (!user) {
+      res.status(404).json({ message: "Usuário não encontrado" });
+      return;
+    }
+    res.status(200).json({ message: "Usuário atualizado com sucesso! API", user });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+
+}
+
+
 export const listAllUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     const users = await User.find();
@@ -135,18 +154,37 @@ export const listAllUsersPaginated = async (req: Request, res: Response): Promis
     const limit = parseInt(req.query.limit as string) || 10;
     const skip = (page - 1) * limit;
 
-    const users = await User.find({})
+    const filters: { [key: string]: any } = {};
+    if (req.query.papel) {
+      filters.papel = req.query.papel;
+    }
+    if (req.query.email) {
+      filters.email = new RegExp(req.query.email as string, "i");
+    }
+    if (req.query.nome) {
+      filters.nome = new RegExp(req.query.nome as string, "i");
+    }
+
+    const users = await User.find(filters)
       .skip(skip)
       .limit(limit);
 
-    const totalUsers = await User.countDocuments();
+    const totalUsers = await User.countDocuments(filters);
 
-    res.status(200).json({ users, totalUsers, totalPages: Math.ceil(totalUsers / limit), currentPage: page });
+    res.status(200).json({
+      users,
+      totalUsers,
+      totalPages: Math.ceil(totalUsers / limit),
+      currentPage: page
+    });
   } catch (error: any) {
-    res.status(500).json({ message: "erro na consulta de paginação ", error: error.message });
-
+    res.status(500).json({
+      message: "Erro na consulta de paginação",
+      error: error.message
+    });
   }
-}
+};
+
 
 export const getUsersByRole = async (req: Request, res: Response): Promise<void> => {
   try {

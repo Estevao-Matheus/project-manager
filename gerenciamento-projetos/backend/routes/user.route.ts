@@ -13,7 +13,7 @@ import { checkUser } from "../middlewares/AuthMiddleWare";
 
 const router: Router = Router();
 
-router.get("/verify", checkUser);
+router.post("/verify", checkUser);
 router.post("/register", register);
 router.post("/login", login);
 router.get("/logout", logout);
