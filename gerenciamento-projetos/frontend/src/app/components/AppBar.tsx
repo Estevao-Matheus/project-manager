@@ -15,7 +15,14 @@ import AdbIcon from '@mui/icons-material/Adb';
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Logout'];
 
-function ResponsiveAppBar() {
+interface AppBarProps {
+  open: boolean;
+  handleSidebar: () => void;
+}
+
+
+
+function ResponsiveAppBar({ open, handleSidebar }: AppBarProps) {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -34,10 +41,21 @@ function ResponsiveAppBar() {
     setAnchorElUser(null);
   };
 
+
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
+          <IconButton
+            size="large"
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={handleSidebar}
+            color="inherit"
+          >
+            <MenuIcon />
+          </IconButton>
           <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
           <Typography
             variant="h6"
