@@ -13,22 +13,76 @@ export const getProjects = async (req: Request, res: Response): Promise<void> =>
 
 export const getProjectsPaginated = async (req: Request, res: Response): Promise<void> => {
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 10;
+    // Pagination parameters
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const limit = parseInt(req.query.limit as string, 10) || 10;
     const skip = (page - 1) * limit;
-    console.log(page, limit, skip);
-    const projects = await Project.find({})
-      .skip(skip)
-      .limit(limit);
 
-    const totalProjects = await Project.countDocuments();
+    if (page < 1 || limit < 1) {
+      res.status(400).json({ message: "Página e limite devem ser maiores que 0" });
+      return;
+    }
 
-    res.status(200).json({ projects, totalProjects, totalPages: Math.ceil(totalProjects / limit), currentPage: page });
+    // Filter parameters
+    const status = req.query.status as string | undefined;
+    let startDate: Date | undefined;
+    let endDate: Date | undefined;
+
+    // Validate and parse date filters
+    if (req.query.start_date) {
+      startDate = new Date(req.query.start_date as string);
+      if (isNaN(startDate.getTime())) {
+        res.status(400).json({ message: "Data inicial inválida. Formato esperado: YYYY-MM-DD" });
+        return;
+      }
+    }
+
+    if (req.query.end_date) {
+      endDate = new Date(req.query.end_date as string);
+      if (isNaN(endDate.getTime())) {
+        res.status(400).json({ message: "Data final inválida. Formato esperado: YYYY-MM-DD" });
+        return;
+      }
+    }
+
+    // Validate date range
+    if (startDate && endDate && startDate > endDate) {
+      res.status(400).json({ message: "Data inicial não pode ser maior que a data final" });
+      return;
+    }
+
+    // Create filter object
+    const filter: any = {};
+    if (status && ["Em andamento", "Concluído", "Pendente"].includes(status)) {
+      filter.status = status;
+    } else if (status) {
+      res.status(400).json({ message: "Status inválido. Use: 'Em andamento', 'Concluído', 'Pendente'" });
+      return;
+    }
+    if (startDate) filter.data_inicio = { $gte: startDate };
+    if (endDate) filter.data_fim = { $lte: endDate };
+
+    // Query with filter and pagination
+    const projects = await Project.find(filter).skip(skip).limit(limit).exec();
+    const totalProjects = await Project.countDocuments(filter).exec();
+
+    res.status(200).json({
+      projects,
+      totalProjects,
+      totalPages: Math.ceil(totalProjects / limit),
+      currentPage: page,
+      filters: {
+        status: req.query.status,
+        start_date: req.query.start_date,
+        end_date: req.query.end_date
+      }
+    });
   } catch (error: any) {
-    res.status(500).json({ message: "erro na consulta de paginação ", error: error.message });
-
+    res.status(500).json({ message: "Erro na consulta de paginação", error: error.message });
   }
-}
+};
+
+
 
 export const getProject = async (req: Request, res: Response): Promise<void> => {
   try {
