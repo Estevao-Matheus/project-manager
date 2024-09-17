@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import mongoose from "mongoose";
 import projectRoute from "./routes/project.route";
 import authRoute from "./routes/user.route";
+import streamRoute from './routes/stream.route'
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
@@ -19,6 +20,7 @@ app.use(cors({
 //routes
 app.use("/api/projects", projectRoute);
 app.use("/api/auth", authRoute);
+app.use("/api/stream", streamRoute);
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
