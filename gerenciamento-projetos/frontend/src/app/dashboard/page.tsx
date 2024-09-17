@@ -15,6 +15,7 @@ import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import Header from "../components/Header";
 import StatusBox from "../components/Dashboard/StatBox";
 import MyResponsivePie from "../components/Dashboard/charts/PieChart";
+import MyResponsiveBarChart from "../components/Dashboard/charts/BarChart";
 //Helpers
 import { calculateProgress } from "../Helpers/progressHelper";
 import { transformRoleCounts } from "../Helpers/transformRoleCount";
@@ -103,9 +104,9 @@ const Dashboard: React.FC = () => {
       >
         <Header title="Dashboard" subtitle="Bem vindo ao seu dashboard" />
         <Typography
-          variant="h5"
+          variant="h4"
           color={colors.greenAccent[400]}
-          sx={{ m: "0 0 10px 26px" }}
+          sx={{ m: "0 0 40px 26px" }}
         >Usuarios</Typography>
         <Box display={'flex'} justifyContent={'space-between'} >
 
@@ -120,8 +121,9 @@ const Dashboard: React.FC = () => {
             />
           ))}
         </Box>
-        <Box display={'flex'} justifyContent={'space-between'} sx={{ backgroundColor: colors.primary[400], mb: '20px', mt: '20px', ml: '26px', height: '50vh', width: '50vw' }} >
+        <Box display={'flex'} justifyContent={'space-between'} sx={{ backgroundColor: colors.primary[400], mb: '20px', mt: '20px', ml: '26px', height: '50vh', width: '90vw' }} >
           <MyResponsivePie data={transformRoleCounts(roleCounts)} />
+          <MyResponsiveBarChart data={transformRoleCounts(roleCounts)} />
         </Box>
          <Box
             sx={{
@@ -140,12 +142,12 @@ const Dashboard: React.FC = () => {
         </Box>
         <Box sx={{margin: '20px 0 20px 0'}}>
           <Typography
-          variant="h5"
+          variant="h4"
           color={colors.greenAccent[400]}
           sx={{ m: "0 0 10px 26px" }}
         >Projetos</Typography>
         </Box>
-        <Box display={'flex'} justifyContent={'space-between'} sx={{mt: '20px'}} >
+        <Box display={'flex'} justifyContent={'space-between'} sx={{mt: '40px'}} >
 
           {projectCounts.map((project, index) => (
             <StatusBox
@@ -159,21 +161,22 @@ const Dashboard: React.FC = () => {
           ))}
         </Box>
       </Box>
-       <Box display={'flex'} justifyContent={'space-between'} sx={{ backgroundColor: colors.primary[400], mb: '20px', mt: '20px', ml: '76px', height: '50vh', width: '50vw' }} >
+       <Box display={'flex'} justifyContent={'space-between'} sx={{ backgroundColor: colors.primary[400], mb: '20px', mt: '20px', ml: '76px', height: '50vh', width: '90vw' }} >
           <MyResponsivePie data={transformRoleCounts(projectCounts)} />
+          <MyResponsiveBarChart data={transformRoleCounts(projectCounts)} />
         </Box>
          <Box
             sx={{
                 padding: { xs: 2, sm: 4, md: 6 },
                 margin: '0 auto',
                 mb: '20px',
+                ml: 10,
                 minWidth: '90vw',
                 textAlign: 'center',
                 alignItems: 'center',
                 display: 'flex',
                 flexDirection: 'column',
-                backgroundColor: colors.primary[400],
-                ml: '20px'
+                backgroundColor: colors.primary[400]
             }}
         >
           <TableProjects />
