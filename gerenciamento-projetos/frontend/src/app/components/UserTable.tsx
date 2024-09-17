@@ -6,6 +6,7 @@ import { DataGrid, GridColDef, GridRowsProp, GridRowParams } from '@mui/x-data-g
 import axios from 'axios';
 import { User } from '../types/User';
 import UserModal from './UserModal';
+import { toast } from 'react-toastify';
 
 const UserTable: React.FC = () => {
     const [users, setUsers] = useState<User[]>([]);
@@ -54,15 +55,18 @@ const UserTable: React.FC = () => {
 
     const handleDelete = async (userId: string) => {
         try {
-            await axios.delete(`http://localhost:3000/api/auth/users/${userId}`);
+            const response = await axios.delete(`http://localhost:3000/api/auth/users/${userId}`);
             fetchUsers();
+            toast.success('Usuário excluído com sucesso!');
         } catch (error) {
-            console.error('Failed to delete user:', error);
+            const errorMessage = error?.response?.data?.message || 'Falha ao excluir o usuário!';
+            console.error('Failed to delete the user:', errorMessage);
+            toast.error(errorMessage);
         }
-    };
+    }
 
     const handleFilterChange = () => {
-        setPage(0); // Reset to first page on filter change
+        setPage(0);
         fetchUsers();
     };
 
