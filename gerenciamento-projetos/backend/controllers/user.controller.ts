@@ -188,6 +188,8 @@ export const listAllUsersPaginated = async (req: Request, res: Response): Promis
 
 export const getUsersByRole = async (req: Request, res: Response): Promise<void> => {
   try {
+    const allRoles = ["Desenvolvedor", "Administrador", "Usuario"];
+
     const result = await User.aggregate([
       {
         $group: {
@@ -195,9 +197,32 @@ export const getUsersByRole = async (req: Request, res: Response): Promise<void>
           count: { $sum: 1 },
         },
       },
-    ])
-    res.status(200).json(result);
+    ]);
+
+    const rolesCount = allRoles.map(role => ({
+      _id: role,
+      count: 0
+    }));
+
+    result.forEach((role: any) => {
+      const index = rolesCount.findIndex(r => r._id === role._id);
+      if (index !== -1) {
+        rolesCount[index].count = role.count;
+      }
+    });
+
+
+    const totalUsers = await User.countDocuments();
+
+
+    rolesCount.unshift({
+      _id: "Total de Usuários",
+      count: totalUsers
+    });
+
+
+    res.status(200).json(rolesCount);
   } catch (err: any) {
-    res.status(500).json({ message: "Falha ao obter os usuarios", error: err.message });
+    res.status(500).json({ message: "Falha ao obter os usuários", error: err.message });
   }
 };

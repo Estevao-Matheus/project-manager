@@ -239,8 +239,21 @@ export const getProjectsByStatus = async (req: Request, res: Response): Promise<
       },
     ]);
 
-    res.status(200).json(result);
+    const totalProjects = await Project.countDocuments({});
+
+    const finalResult = [
+      {
+        _id: "Total de Projetos",
+        count: totalProjects,
+      },
+      ...result,
+    ];
+
+    res.status(200).json(finalResult);
   } catch (error: any) {
-    res.status(500).json({ message: "Erro ao listar quantidade de projetos por status", error: error.message });
+    res.status(500).json({
+      message: "Erro ao listar quantidade de projetos por status",
+      error: error.message,
+    });
   }
 };
