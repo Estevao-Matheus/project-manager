@@ -90,7 +90,7 @@ const UserTable: React.FC = () => {
     return (
         <>
             <Box sx={{ mb: 2 }}>
-                <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+                <Box sx={{ width: '60vw', display: 'flex', gap: 2, mb: 2 }}>
                     <TextField
                         label="Nome"
                         value={filterNome}
