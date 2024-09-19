@@ -18,7 +18,7 @@ const requireAdmin = async (req: Request, res: Response, next: NextFunction) => 
         const user = await User.findById(decoded.id);
 
         if (!user || user.papel !== "Administrador") {
-            return res.status(403).json({ message: "Acesso negado" });
+            return res.status(403).json({ message: "Acesso negado, voce não é um administrador" });
         }
 
         next();
