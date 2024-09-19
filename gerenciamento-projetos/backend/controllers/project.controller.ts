@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import Project from "../models/project.model";
 import ProjetosUsuarios from "../models/projectUser.model";
+import ProjectUser from "../models/projectUser.model";
+import User from "../models/user.model";
 
 export const getProjects = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -13,7 +15,6 @@ export const getProjects = async (req: Request, res: Response): Promise<void> =>
 
 export const getProjectsPaginated = async (req: Request, res: Response): Promise<void> => {
   try {
-    // Pagination parameters
     const page = parseInt(req.query.page as string, 10) || 1;
     const limit = parseInt(req.query.limit as string, 10) || 10;
     const skip = (page - 1) * limit;
@@ -23,12 +24,11 @@ export const getProjectsPaginated = async (req: Request, res: Response): Promise
       return;
     }
 
-    // Filter parameters
     const status = req.query.status as string | undefined;
     let startDate: Date | undefined;
     let endDate: Date | undefined;
+    const userId = req.query.user_id as string | undefined;
 
-    // Validate and parse date filters
     if (req.query.start_date) {
       startDate = new Date(req.query.start_date as string);
       if (isNaN(startDate.getTime())) {
@@ -45,13 +45,11 @@ export const getProjectsPaginated = async (req: Request, res: Response): Promise
       }
     }
 
-    // Validate date range
     if (startDate && endDate && startDate > endDate) {
       res.status(400).json({ message: "Data inicial não pode ser maior que a data final" });
       return;
     }
 
-    // Create filter object
     const filter: any = {};
     if (status && ["Em andamento", "Concluído", "Pendente"].includes(status)) {
       filter.status = status;
@@ -62,7 +60,38 @@ export const getProjectsPaginated = async (req: Request, res: Response): Promise
     if (startDate) filter.data_inicio = { $gte: startDate };
     if (endDate) filter.data_fim = { $lte: endDate };
 
-    // Query with filter and pagination
+    // Filter by user if user_id is provided
+    if (userId) {
+      // Check if the user exists
+      const user = await User.findById(userId);
+      if (!user) {
+        res.status(400).json({ message: "Usuário não encontrado" });
+        return;
+      }
+
+      // Find project IDs associated with the user
+      const userProjects = await ProjectUser.find({ usuario_id: userId }).exec();
+      const projectIds = userProjects.map(up => up.projeto_id);
+
+      if (projectIds.length === 0) {
+        res.status(200).json({
+          projects: [],
+          totalProjects: 0,
+          totalPages: 0,
+          currentPage: page,
+          filters: {
+            status: req.query.status,
+            start_date: req.query.start_date,
+            end_date: req.query.end_date,
+            user_id: req.query.user_id
+          }
+        });
+        return;
+      }
+
+      filter._id = { $in: projectIds };
+    }
+
     const projects = await Project.find(filter).skip(skip).limit(limit).exec();
     const totalProjects = await Project.countDocuments(filter).exec();
 
@@ -74,7 +103,8 @@ export const getProjectsPaginated = async (req: Request, res: Response): Promise
       filters: {
         status: req.query.status,
         start_date: req.query.start_date,
-        end_date: req.query.end_date
+        end_date: req.query.end_date,
+        user_id: req.query.user_id
       }
     });
   } catch (error: any) {

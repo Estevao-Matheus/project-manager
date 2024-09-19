@@ -6,7 +6,8 @@ import {
   deleteUser,
   listAllUsers,
   listAllUsersPaginated,
-  getUsersByRole
+  getUsersByRole,
+  updateUser
 } from "../controllers/user.controller";
 
 import { checkUser } from "../middlewares/AuthMiddleWare";
@@ -18,6 +19,7 @@ router.post("/verify", checkUser);
 router.post("/register", register);
 router.post("/login", login);
 router.get("/logout", logout);
+router.put("/user/:id", updateUser);
 router.delete("/user/:id", requireAdmin, deleteUser);
 router.get("/users", listAllUsers);
 router.get("/users/paginated", listAllUsersPaginated);

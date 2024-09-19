@@ -12,6 +12,8 @@ import {
   getProjectsByStatus
 } from "../controllers/project.controller";
 
+import { getProjectsByUser } from "../controllers/projectUser.controller";
+
 const router: Router = express.Router();
 
 interface AddUserRequest extends Request {
@@ -47,6 +49,8 @@ router.post("/addUser", (req: AddUserRequest, res: Response) => addUserToProject
 router.post("/removeUser", (req: RemoveUserRequest, res: Response) => removeUserFromProject(req, res));
 
 router.get("/:projetoId/usuarios", (req: Request, res: Response) => listUsersInProject(req, res));
+
+router.get("/:userId/projects", (req: Request, res: Response) => getProjectsByUser(req, res));
 
 
 export default router;
