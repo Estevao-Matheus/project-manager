@@ -1,14 +1,15 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import ResponsiveAppBar from '../components/AppBar';
-import Footer from '../components/Footer';
-import Sidebar from '../components/Sidebar';
+import ResponsiveAppBar from '../components/Navigation/AppBar';
+import Footer from '../components/Navigation/Footer';
+import Sidebar from '../components/Navigation/Sidebar';
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
 
 import { toast, ToastContainer } from 'react-toastify';
-import UserTable from '../components/UserTable';
+import UserTable from '../components/User/UserTable';
+
 
 const Users: React.FC = () => {
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
@@ -69,7 +70,7 @@ return (
             >
                 Gerenciamento de Usuarios
             </Typography>
-            <UserTable />
+            <UserTable buttonShow={false} />
         </Box>
         <Footer />
         <ToastContainer />

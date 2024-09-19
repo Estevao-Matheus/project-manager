@@ -1,10 +1,10 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { Box, Typography } from '@mui/material';
-import ProjectTable from '../components/TableProjects';
-import ResponsiveAppBar from '../components/AppBar';
-import Footer from '../components/Footer';
-import Sidebar from '../components/Sidebar';
+import ProjectTable from '../components/Project/TableProjects';
+import ResponsiveAppBar from '../components/Navigation/AppBar';
+import Footer from '../components/Navigation/Footer';
+import Sidebar from '../components/Navigation/Sidebar';
 import axios from 'axios';
 import { useCookies } from 'react-cookie';
 
@@ -71,7 +71,7 @@ return (
             >
                 Gerenciamento de Projetos
             </Typography>
-            <ProjectTable />
+            <ProjectTable buttonShow ={true} />
         </Box>
         <Footer />
         <ToastContainer />

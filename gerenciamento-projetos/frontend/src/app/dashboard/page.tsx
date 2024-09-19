@@ -1,8 +1,8 @@
 'use client';
 import { Box, Button, colors, IconButton, Typography, useTheme } from "@mui/material";
-import ResponsiveAppBar from '../components/AppBar';
-import Sidebar from '../components/Sidebar';
-import Footer from '../components/Footer';
+import ResponsiveAppBar from '../components/Navigation/AppBar';
+import Sidebar from '../components/Navigation/Sidebar';
+import Footer from '../components/Navigation/Footer';
 import { ToastContainer } from "react-toastify";
 import { useCookies } from "react-cookie";
 import { useEffect, useState } from "react";
@@ -19,8 +19,8 @@ import MyResponsiveBarChart from "../components/Dashboard/charts/BarChart";
 //Helpers
 import { calculateProgress } from "../Helpers/progressHelper";
 import { transformRoleCounts } from "../Helpers/transformRoleCount";
-import UserTable from "../components/UserTable";
-import TableProjects from "../components/TableProjects";
+import UserTable from "../components/User/UserTable";
+import TableProjects from "../components/Project/TableProjects";
 
 
 interface RoleCount {
@@ -138,7 +138,7 @@ const Dashboard: React.FC = () => {
                 ml: '20px'
             }}
         >
-          <UserTable />
+          <UserTable buttonShow={false} />
         </Box>
         <Box sx={{margin: '20px 0 20px 0'}}>
           <Typography
@@ -179,7 +179,7 @@ const Dashboard: React.FC = () => {
                 backgroundColor: colors.primary[400]
             }}
         >
-          <TableProjects />
+          <TableProjects  buttonShow = {false}/>
         </Box>
       <Footer />
       <ToastContainer />
