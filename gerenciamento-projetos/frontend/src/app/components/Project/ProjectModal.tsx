@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, TextField, Button, Autocomplete, useMediaQuery, useTheme, Chip, Typography, responsiveFontSizes } from '@mui/material';
 import axios from 'axios';
-import { Project } from '../types/Project';
-import { User } from '../types/User'; 
+import { Project } from '../../types/Project';
+import { User } from '../../types/User'; 
 import { toast } from 'react-toastify';
 
 interface ProjectModalProps {

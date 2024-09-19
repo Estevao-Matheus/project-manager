@@ -5,13 +5,16 @@ import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { Box, Button, TextField, IconButton, MenuItem } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 import ProjectModal from './ProjectModal';
-import DeleteModal from './DeleteModal';
-import { Project } from '../types/Project';
-import { User } from '../types/User';
+import DeleteModal from '../DeleteModal';
+import { Project } from '../../types/Project';
+import { User } from '../../types/User';
 import { toast } from 'react-toastify';
-import { formatDateFromServer } from '../Helpers/dateHelpers';
 
-const ProjectTable: React.FC = () => {
+interface IProjectTable {
+   buttonShow?: boolean
+}
+
+const ProjectTable: React.FC <IProjectTable> = ( {buttonShow = true }) => {
     const [projects, setProjects] = useState<Project[]>([]);
     const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
     const [open, setOpen] = useState(false);
@@ -23,13 +26,14 @@ const ProjectTable: React.FC = () => {
         nome: '',
         dataInicio: '',
         dataFim: '',
-        status: ''
+        status: '',
+        userId: ''
     });
 
     useEffect(() => {
         fetchProjects();
         fetchUsers();
-    }, []);
+    }, [filters]); 
 
     useEffect(() => {
         applyFilters();
@@ -37,8 +41,18 @@ const ProjectTable: React.FC = () => {
 
     const fetchProjects = async () => {
         try {
-            const response = await axios.get<Project[]>('http://localhost:3000/api/projects');
-            setProjects(response.data);
+            const query = new URLSearchParams({
+                page: '1', 
+                limit: '10', 
+                nome: filters.nome,
+                data_inicio: filters.dataInicio,
+                data_fim: filters.dataFim,
+                status: filters.status,
+                user_id: filters.userId
+            }).toString();
+            
+            const response = await axios.get<Project[]>(`http://localhost:3000/api/projects/paginated?${query}`);
+            setProjects(response.data.projects);
         } catch (error) {
             console.error('Failed to fetch projects:', error);
         }
@@ -56,6 +70,7 @@ const ProjectTable: React.FC = () => {
     const applyFilters = () => {
         let filtered = [...projects];
 
+        // Apply filters
         if (filters.nome) {
             filtered = filtered.filter((project) =>
                 project.nome.toLowerCase().includes(filters.nome.toLowerCase())
@@ -124,7 +139,6 @@ const ProjectTable: React.FC = () => {
         fetchProjects();
     };
 
-
     const columns: GridColDef[] = [
         { field: 'nome', headerName: 'Nome', flex: 1 },
         { field: 'descricao', headerName: 'Descrição', flex: 1 },
@@ -150,9 +164,11 @@ const ProjectTable: React.FC = () => {
 
     return (
         <Box sx={{ padding: 2 }}>
+             {buttonShow && (
             <Button variant="contained" color="primary" onClick={handleAddProject} style={{ marginBottom: 16 }}>
                 Add Projeto
             </Button>
+             )}
             <Box display="flex" gap={2} mb={2}>
                 <TextField
                     label="Nome"
@@ -164,12 +180,14 @@ const ProjectTable: React.FC = () => {
                     label="Data Início"
                     type="date"
                     InputLabelProps={{ shrink: true }}
+                    value={filters.dataInicio}
                     onChange={(e) => setFilters({ ...filters, dataInicio: e.target.value })}
                 />
                 <TextField
                     label="Data Encerramento"
                     type="date"
                     InputLabelProps={{ shrink: true }}
+                    value={filters.dataFim}
                     onChange={(e) => setFilters({ ...filters, dataFim: e.target.value })}
                 />
                 <TextField
@@ -184,6 +202,21 @@ const ProjectTable: React.FC = () => {
                     <MenuItem value="Em andamento">Em andamento</MenuItem>
                     <MenuItem value="Concluído">Concluído</MenuItem>
                     <MenuItem value="Pendente">Pendente</MenuItem>
+                </TextField>
+                <TextField
+                    select
+                    label="Usuário"
+                    variant="outlined"
+                    value={filters.userId}
+                    onChange={(e) => setFilters({ ...filters, userId: e.target.value })}
+                    style={{ width: 200 }}
+                >
+                    <MenuItem value="">Todos</MenuItem>
+                    {users.map((user) => (
+                        <MenuItem key={user._id} value={user._id}>
+                            {user.nome}
+                        </MenuItem>
+                    ))}
                 </TextField>
             </Box>
             <Box sx={{ width: '60vw' }}>

@@ -1,8 +1,9 @@
+
+'use client';
 import * as React from 'react';
 import { styled, useTheme } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
-import CssBaseline from '@mui/material/CssBaseline';
 import List from '@mui/material/List';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
@@ -12,8 +13,11 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
+import DashboardCustomizeRoundedIcon from '@mui/icons-material/DashboardCustomizeRounded';
+import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
+import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 const drawerWidth = 240;
 
@@ -27,7 +31,6 @@ const DrawerHeader = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   padding: theme.spacing(0, 1),
-  // necessary for content to be below app bar
   ...theme.mixins.toolbar,
   justifyContent: 'flex-end',
 }));
@@ -57,29 +60,39 @@ export default function PersistentDrawerLeft({ open, handleSidebar }: SidebarPro
         </DrawerHeader>
         <Divider />
         <List>
-          {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-            <ListItem key={text} disablePadding>
+            <Link href={'/dashboard'}>
+            <ListItem key={'Dashboard'} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  <DashboardCustomizeRoundedIcon />
                 </ListItemIcon>
-                <ListItemText primary={text} />
+                <ListItemText primary='Dashboard' />
               </ListItemButton>
             </ListItem>
-          ))}
+            </Link>
         </List>
         <Divider />
         <List>
-          {['All mail', 'Trash', 'Spam'].map((text, index) => (
-            <ListItem key={text} disablePadding>
+           <Link href={'/users'}>
+            <ListItem key={'users'} disablePadding>
               <ListItemButton>
                 <ListItemIcon>
-                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                 <AccountCircleRoundedIcon />
                 </ListItemIcon>
-                <ListItemText primary={text} />
+                <ListItemText primary={'Usuarios'} />
               </ListItemButton>
             </ListItem>
-          ))}
+            </Link>
+            <Link href={'/projects'}>
+            <ListItem key={'projects'} disablePadding>
+              <ListItemButton >
+                <ListItemIcon>
+                 <WorkOutlineIcon />
+                </ListItemIcon>
+                <ListItemText primary={'Projetos'} />
+              </ListItemButton >
+            </ListItem>
+            </Link>
         </List>
       </Drawer>
     </Box>

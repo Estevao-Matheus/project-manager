@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, TextField, Button, Autocomplete, useMediaQuery, useTheme, Typography, responsiveFontSizes } from '@mui/material';
 import axios from 'axios';
-import { User } from '../types/User'; 
+import { User } from '../../types/User'; 
 import { toast } from 'react-toastify';
 
 interface UserModalProps {
@@ -51,7 +51,7 @@ const UserModal: React.FC<UserModalProps> = ({ open, handleClose, user }) => {
             valid = false;
         }
 
-        if (!senha.trim() && !user) { // Only validate senha if adding a new user
+        if (!senha.trim() && !user) { 
             setSenhaError('Senha é obrigatória');
             valid = false;
         }
@@ -76,11 +76,9 @@ const UserModal: React.FC<UserModalProps> = ({ open, handleClose, user }) => {
             };
 
             if (user) {
-                // Update existing user
-                const response = await axios.put(`http://localhost:3000/api/auth/users/${user._id}`, payload);
+                const response = await axios.put(`http://localhost:3000/api/auth/user/${user._id}`, payload);
                 toast.success(response.data.message || 'Usuário atualizado com sucesso!');
             } else {
-                // Add new user
                 const response = await axios.post('http://localhost:3000/api/auth/register', payload);
                 toast.success(response.data.message || 'Usuário adicionado com sucesso!');
             }

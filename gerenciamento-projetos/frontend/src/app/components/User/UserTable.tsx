@@ -4,11 +4,16 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DataGrid, GridColDef, GridRowsProp, GridRowParams } from '@mui/x-data-grid';
 import axios from 'axios';
-import { User } from '../types/User';
+import { User } from '../../types/User';
 import UserModal from './UserModal';
 import { toast } from 'react-toastify';
 
-const UserTable: React.FC = () => {
+
+interface IUserTable {
+    buttonShow?: boolean
+}
+
+const UserTable: React.FC <IUserTable> = ({buttonShow = true }) =>  {
     const [users, setUsers] = useState<User[]>([]);
     const [totalUsers, setTotalUsers] = useState<number>(0);
     const [page, setPage] = useState<number>(0);
@@ -56,6 +61,7 @@ const UserTable: React.FC = () => {
     const handleDelete = async (userId: string) => {
         try {
             const response = await axios.delete(`http://localhost:3000/api/auth/users/${userId}`);
+            console.log(response)
             fetchUsers();
             toast.success('Usuário excluído com sucesso!');
         } catch (error) {
@@ -94,6 +100,9 @@ const UserTable: React.FC = () => {
     return (
         <>
             <Box sx={{ mb: 2 }}>
+                {buttonShow &&(
+                 <Button sx={{ mb: 4 }} variant="contained" onClick={handleFilterChange}>Add Usuario</Button>
+                )}
                 <Box sx={{ width: '60vw', display: 'flex', gap: 2, mb: 2 }}>
                     <TextField
                         label="Nome"
@@ -114,7 +123,7 @@ const UserTable: React.FC = () => {
                             <MenuItem value="Usuário">Usuário</MenuItem>
                         </Select>
                     </FormControl>
-                    <Button variant="contained" onClick={handleFilterChange}>Add Usuario</Button>
+                   
                 </Box>
             </Box>
             <Box sx={{ width: '60vw' }}>
@@ -127,12 +136,12 @@ const UserTable: React.FC = () => {
                     paginationMode="server"
                     onPageSizeChange={handleRowsPerPageChange}
                     onPageChange={handlePageChange}
-                    getRowId={(row) => row._id} // Ensure each row has a unique ID
+                    getRowId={(row) => row._id} 
                 />
             </Box>
             <UserModal
                 open={open}
-                handleClose={() => setOpen(false)}
+                handleClose={() => {setOpen(false), fetchUsers()}}
                 user={selectedUser}
                 fetchUsers={fetchUsers}
             />
