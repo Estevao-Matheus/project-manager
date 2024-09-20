@@ -11,6 +11,8 @@ import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Logout'];
@@ -40,7 +42,18 @@ function ResponsiveAppBar({ open, handleSidebar }: AppBarProps) {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
-
+   
+   const handleLogout = async () => {
+     try {
+       const response = await axios.get('http://localhost:3000/api/auth/logout', {
+      withCredentials: true, 
+    });
+        toast.success(response.data.message);
+        window.location.href = '/';
+     } catch (error) {
+       console.error('Failed to logout:', error);
+     }
+   };
 
   return (
     <AppBar position="static">
@@ -129,11 +142,11 @@ function ResponsiveAppBar({ open, handleSidebar }: AppBarProps) {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
+              
+                <MenuItem key={'logout'} onClick={handleLogout}>
+                  <Typography sx={{ textAlign: 'center' }}>Logout</Typography>
                 </MenuItem>
-              ))}
+             
             </Menu>
           </Box>
         </Toolbar>

@@ -70,9 +70,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const login = async (req: Request, res: Response): Promise<void> => {
-  const { email, senha } = req.body;
-
   try {
+    const { email, senha } = req.body;
     const user: IUser = await User.login(email, senha);
     const token = createToken(user._id);
 
@@ -99,7 +98,13 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const logout = (req: Request, res: Response): void => {
-  res.cookie("jwt", "", { maxAge: 1 });
+  res.cookie("jwt", "", {
+    httpOnly: false,
+    secure: process.env.NODE_ENV !== 'development',
+    sameSite: 'strict',
+    maxAge: 1
+  });
+  res.set("Access-Control-Allow-Credentials", "true");
   res.status(200).json({ message: "Logged out com sucesso" });
 };
 
