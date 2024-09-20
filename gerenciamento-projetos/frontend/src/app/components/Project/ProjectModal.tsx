@@ -20,6 +20,8 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     const [userOptions, setUserOptions] = useState<User[]>([]);
+    const [statusOptions, setStatusOptions] = useState<Array<'Em andamento' | 'Pendente' | 'Concluido'>>([
+        'Em andamento', 'Pendente', 'Concluido' ])
 
     // Validation states
     const [nomeError, setNomeError] = useState<string>('');
@@ -245,17 +247,18 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
                     error={!!dataFimError}
                     helperText={dataFimError}
                 />
-                <TextField
-                    fullWidth
-                    margin="normal"
-                    label="Status"
+    
+                 <Autocomplete
+                    options={statusOptions}
+                    getOptionLabel={(option) => option}
+                    renderInput={(params) => <TextField {...params} label="Status" />}
                     value={status}
-                    onChange={(e) => {
-                        setStatus(e.target.value);
+                    onChange={(event, value) => {
+                        setStatus(value || '');
                         if (statusError) setStatusError('');
                     }}
-                    error={!!statusError}
-                    helperText={statusError}
+                    isOptionEqualToValue={(option, value) => option === value}
+                    sx={{mb: 2, mt:2}}
                 />
                 
                 <Autocomplete

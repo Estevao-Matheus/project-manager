@@ -14,6 +14,9 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { createTheme, PaletteMode, ThemeProvider, styled } from '@mui/material/styles';
 import axios from 'axios';
+import { Autocomplete } from '@mui/material';
+import { useState } from 'react';
+import { redirect } from 'next/navigation';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -33,16 +36,20 @@ const Card = styled(MuiCard)(({ theme }) => ({
 
 export default function SignUp() {
   const [mode, setMode] = React.useState<PaletteMode>('light');
-  const [showCustomTheme, setShowCustomTheme] = React.useState(true);
+  const [showCustomTheme, setShowCustomTheme] = useState(true);
   const defaultTheme = createTheme({ palette: { mode } });
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
+  const [emailError, setEmailError] = useState(false);
+  const [emailErrorMessage, setEmailErrorMessage] = useState('');
   const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  const [nameError, setNameError] = React.useState(false);
-  const [nameErrorMessage, setNameErrorMessage] = React.useState('');
-  const [roleError, setRoleError] = React.useState(false);
-  const [roleErrorMessage, setRoleErrorMessage] = React.useState('');
+  const [passwordErrorMessage, setPasswordErrorMessage] = useState('');
+  const [nameError, setNameError] = useState(false);
+  const [nameErrorMessage, setNameErrorMessage] = useState('');
+  const [roleError, setRoleError] = useState(false);
+  const [roleErrorMessage, setRoleErrorMessage] = useState('');
+  const [role, setRole] = useState<'Desenvolvedor' | 'Administrador' | 'Usuário'>('');
+    const [roleOptions, setRoleOptions] = useState<Array<'Desenvolvedor' | 'Administrador' | 'Usuário'>>([
+        'Desenvolvedor', 'Administrador', 'Usuário'
+    ]);
 
   React.useEffect(() => {
     const savedMode = localStorage.getItem('themeMode') as PaletteMode | null;
@@ -103,11 +110,12 @@ export default function SignUp() {
         nome: data.get('name'),
         email: data.get('email'),
         senha: data.get('password'),
-        papel: data.get('role'),
+        papel: role,
       });
 
       if (response.data.created) {
         toast.success(response.data.msg || 'Usuário criado com sucesso!');
+        window.location.replace('/');
       } else if (response.data.errors) {
         Object.keys(response.data.errors).forEach((field) => {
           if (response.data.errors[field]) {
@@ -178,17 +186,18 @@ export default function SignUp() {
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="role">Papel</FormLabel>
-              <TextField
-                autoComplete="role"
-                name="role"
-                required
-                fullWidth
-                id="role"
-                placeholder="Desenvolvedor"
-                error={roleError}
-                helperText={roleErrorMessage}
-                color={roleError ? 'error' : 'primary'}
-              />
+              <Autocomplete
+                    id='role'
+                    options={roleOptions}
+                    getOptionLabel={(option) => option}
+                    renderInput={(params) => <TextField {...params}  placeholder='Desenvolvedor' />}
+                    value={role}
+                    onChange={(event, value) => {
+                        setRole(value || '');
+                        if (roleError) setRoleError('');
+                    }}
+                    isOptionEqualToValue={(option, value) => option === value}
+                />
             </FormControl>
             <Button type="submit" fullWidth variant="contained">
               Cadastrar

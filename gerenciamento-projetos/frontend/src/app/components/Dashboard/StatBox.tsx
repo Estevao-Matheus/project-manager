@@ -16,7 +16,7 @@ const StatusBox = ({ title, subtitle, icon, progress, increase }: IStatBoxProps)
     const theme = useTheme();
     const colors = tokens(theme.palette.mode);
     return (
-        <Box width="100%" m="0 30px"  sx={{ minWidth: "300px", p:{ xs: 2, sm: 3, md: 4 }, backgroundColor: colors.primary[400]}}>
+        <Box width="100%" m="0 30px"  sx={{ minWidth: "380px", p:{ xs: 2, sm: 3, md: 4 }, backgroundColor: colors.primary[400]}}>
             <Box display="flex" justifyContent="space-between">
                 <Box>
                     {icon}
