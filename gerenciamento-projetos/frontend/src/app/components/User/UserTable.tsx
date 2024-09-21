@@ -77,9 +77,9 @@ const UserTable: React.FC <IUserTable> = ({buttonShow = true }) =>  {
     };
 
     const columns: GridColDef[] = [
-        { field: 'nome', headerName: 'Nome', width: 200 },
-        { field: 'email', headerName: 'Email', width: 250 },
-        { field: 'papel', headerName: 'Papel', width: 150 },
+        { field: 'nome', headerName: 'Nome', flex: 1 },
+        { field: 'email', headerName: 'Email', flex: 1 },
+        { field: 'papel', headerName: 'Papel', flex: 1 },
         {
             field: 'actions',
             headerName: 'Actions',

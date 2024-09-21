@@ -148,7 +148,7 @@ const ProjectTable: React.FC <IProjectTable> = ( {buttonShow = true }) => {
         {
             field: 'acoes',
             headerName: 'Ações',
-            flex: 0.5,
+            flex: 0.7,
             renderCell: (params) => (
                 <>
                     <IconButton onClick={() => handleEditProject(params.row)}>
@@ -169,7 +169,7 @@ const ProjectTable: React.FC <IProjectTable> = ( {buttonShow = true }) => {
                 Add Projeto
             </Button>
              )}
-            <Box display="flex" gap={2} mb={2}>
+            <Box display="flex"  gap={2} mb={2} sx={{width: {lg: '75vw', xl: '60vw'}}}>
                 <TextField
                     label="Nome"
                     variant="outlined"
@@ -219,7 +219,7 @@ const ProjectTable: React.FC <IProjectTable> = ( {buttonShow = true }) => {
                     ))}
                 </TextField>
             </Box>
-            <Box sx={{ width: '60vw' }}>
+            <Box sx={{ width: { lg: '75vw', xl: '60vw'} }}>
                 <DataGrid
                     rows={filteredProjects}
                     columns={columns}

@@ -13,6 +13,9 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useEffect, useState } from 'react';
+import { User } from '@/app/types/User';
+import NavHeader from './NavHeader';
 
 const pages = ['Products', 'Pricing', 'Blog'];
 const settings = ['Logout'];
@@ -27,7 +30,7 @@ interface AppBarProps {
 function ResponsiveAppBar({ open, handleSidebar }: AppBarProps) {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-
+  const [user, setUser] = useState<User>({});
   const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -54,6 +57,23 @@ function ResponsiveAppBar({ open, handleSidebar }: AppBarProps) {
        console.error('Failed to logout:', error);
      }
    };
+
+   useEffect(() => {
+  const getUser = async () => {
+    try {
+      const { data } = await axios.post('http://localhost:3000/api/auth/verify', {}, { withCredentials: true });
+      if (data.status) {
+        setUser(data.user);
+      } else {
+        console.error('User verification failed');
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  };
+  getUser();
+
+}, []); 
 
   return (
     <AppBar position="static">
@@ -142,7 +162,9 @@ function ResponsiveAppBar({ open, handleSidebar }: AppBarProps) {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              
+              <MenuItem key={'profile'} onClick={handleCloseUserMenu}>
+                <NavHeader name={user.nome} role={user.papel} withHeader= {false} />
+              </MenuItem>
                 <MenuItem key={'logout'} onClick={handleLogout}>
                   <Typography sx={{ textAlign: 'center' }}>Logout</Typography>
                 </MenuItem>

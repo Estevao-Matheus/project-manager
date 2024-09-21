@@ -9,6 +9,7 @@ import axios from 'axios';
 import { useCookies } from 'react-cookie';
 
 import { toast, ToastContainer } from 'react-toastify';
+import Header from '../components/Header';
 
 const Projects: React.FC = () => {
     const [openSidebar, setOpenSidebar] = useState<boolean>(false);
@@ -50,6 +51,9 @@ return (
     >
         <ResponsiveAppBar open={openSidebar} handleSidebar={handleSidebar} />
         <Sidebar open={openSidebar} handleSidebar={handleSidebar} />
+         <Box sx={{ml: 6, mt: 4}}>
+             <Header title='Projetos' subtitle='Gerencie os projetos do sistema.'/>
+        </Box>
         <Box
             sx={{
                 padding: { xs: 2, sm: 4, md: 6 },
@@ -58,19 +62,7 @@ return (
                 textAlign: 'center',
             }}
         >
-            <Typography
-                variant="h2"
-                component="h1"
-                gutterBottom
-                sx={{
-                    fontSize: { xs: '1rem', sm: '1.5rem', md: '2rem' },
-                    fontWeight: 'bold',
-                    color: 'primary.main',
-                    marginBottom: 4
-                }}
-            >
-                Gerenciamento de Projetos
-            </Typography>
+          
             <ProjectTable buttonShow ={true} />
         </Box>
         <Footer />

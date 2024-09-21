@@ -18,6 +18,11 @@ import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { User } from '@/app/types/User';
+import axios from 'axios';
+import { Typography } from '@mui/material';
+import NavHeader from './NavHeader';
 
 const drawerWidth = 240;
 
@@ -36,8 +41,28 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 export default function PersistentDrawerLeft({ open, handleSidebar }: SidebarProps) {
-  const theme = useTheme();
-  
+  const theme = useTheme(); 
+  const [user, setUser] = useState<User>();
+   
+ useEffect(() => {
+  const getUser = async () => {
+    try {
+      const { data } = await axios.post('http://localhost:3000/api/auth/verify', {}, { withCredentials: true });
+      if (data.status) {
+        setUser(data.user);
+      } else {
+        console.error('User verification failed');
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  };
+  getUser();
+
+}, []); 
+
+
+
   return (
     <Box sx={{ display: 'flex' }}>
       <Drawer
@@ -54,6 +79,7 @@ export default function PersistentDrawerLeft({ open, handleSidebar }: SidebarPro
         open={open}
       >
         <DrawerHeader>
+          <NavHeader name={user?.nome} role={user?.papel} />
           <IconButton onClick={handleSidebar}>
             {theme.direction === 'ltr' ? <ChevronLeftIcon /> : <ChevronRightIcon />}
           </IconButton>

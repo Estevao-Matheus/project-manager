@@ -122,7 +122,7 @@ const Dashboard: React.FC = () => {
             />
           ))}
         </Box>
-        <Box display={'flex'} flexDirection={'column'} sx={{ backgroundColor: colors.primary[400], mb: '20px', mt: '20px', ml: '26px', width: '90vw' }} >
+         <Box display={'flex'} flexDirection={'column'} sx={{ backgroundColor: colors.primary[400], mb: '20px', mt: '20px', ml: '23px', width: '90vw' }} >
           <Box>
             <Typography variant="h5" fontWeight={'bold'} color={colors.greenAccent[400]} sx={{ mt: 2, ml: 4, mb: 4 }}>
               Usuario x Papel

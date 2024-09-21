@@ -226,6 +226,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
                     margin="normal"
                     label="Data Início"
                     type="date"
+                    InputLabelProps={{ shrink: true }}
                     value={dataInicio}
                     onChange={(e) => {
                         setDataInicio(e.target.value);
@@ -239,6 +240,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
                     margin="normal"
                     label="Data Encerramento"
                     type="date"
+                    InputLabelProps={{ shrink: true }}
                     value={dataFim}
                     onChange={(e) => {
                         setDataFim(e.target.value);
