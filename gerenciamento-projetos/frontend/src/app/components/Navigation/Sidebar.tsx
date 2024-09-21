@@ -13,9 +13,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import DashboardCustomizeRoundedIcon from '@mui/icons-material/DashboardCustomizeRounded';
-import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
-import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
@@ -23,6 +20,15 @@ import { User } from '@/app/types/User';
 import axios from 'axios';
 import { Typography } from '@mui/material';
 import NavHeader from './NavHeader';
+
+
+//Icones
+
+import DashboardCustomizeRoundedIcon from '@mui/icons-material/DashboardCustomizeRounded';
+import AccountCircleRoundedIcon from '@mui/icons-material/AccountCircleRounded';
+import FolderIcon from '@mui/icons-material/Folder';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+
 
 const drawerWidth = 240;
 
@@ -113,9 +119,19 @@ export default function PersistentDrawerLeft({ open, handleSidebar }: SidebarPro
             <ListItem key={'projects'} disablePadding>
               <ListItemButton >
                 <ListItemIcon>
-                 <WorkOutlineIcon />
+                 <FolderIcon />
                 </ListItemIcon>
                 <ListItemText primary={'Projetos'} />
+              </ListItemButton >
+            </ListItem>
+            </Link>
+            <Link href={'/timeline'}>
+            <ListItem key={'timeline'} disablePadding>
+              <ListItemButton >
+                <ListItemIcon>
+                 <CalendarMonthIcon />
+                </ListItemIcon>
+                <ListItemText primary={'Timeline'} />
               </ListItemButton >
             </ListItem>
             </Link>
