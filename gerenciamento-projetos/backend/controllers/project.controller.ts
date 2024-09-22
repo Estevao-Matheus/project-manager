@@ -4,6 +4,7 @@ import ProjetosUsuarios from "../models/projectUser.model";
 import ProjectUser from "../models/projectUser.model";
 import User from "../models/user.model";
 
+
 export const getProjects = async (req: Request, res: Response): Promise<void> => {
   try {
     const projects = await Project.find({});
@@ -287,3 +288,5 @@ export const getProjectsByStatus = async (req: Request, res: Response): Promise<
     });
   }
 };
+
+

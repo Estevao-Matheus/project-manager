@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User, { IUser } from "../models/user.model"; // Assuming you have a user model with types
+import bcrypt from "bcrypt";
 
 const maxAge = 3 * 24 * 60 * 60; // 3 days
 
@@ -130,7 +131,20 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     const userId = req.params.id;
     const { nome, email, senha, papel } = req.body;
 
-    const user = await User.findByIdAndUpdate(userId, req.body, { new: true });
+    // Cria o objeto apenas com o que vai ser atualizado
+    const updateData: any = {};
+    if (nome) updateData.nome = nome;
+    if (email) updateData.email = email;
+    if (senha) updateData.senha = senha;
+    if (papel) updateData.papel = papel;
+
+    if (senha) {
+      const salt = await bcrypt.genSalt();
+      const hashedSenha = await bcrypt.hash(senha, salt);
+      updateData.senha = hashedSenha;
+    }
+
+    const user = await User.findByIdAndUpdate(userId, updateData, { new: true });
 
     if (!user) {
       res.status(404).json({ message: "Usuário não encontrado" });
@@ -140,7 +154,6 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
   } catch (error: any) {
     res.status(500).json({ message: error.message });
   }
-
 }
 
 
@@ -193,7 +206,7 @@ export const listAllUsersPaginated = async (req: Request, res: Response): Promis
 
 export const getUsersByRole = async (req: Request, res: Response): Promise<void> => {
   try {
-    const allRoles = ["Desenvolvedor", "Administrador", "Usuario"];
+    const allRoles = ["Desenvolvedor", "Administrador", "Usuário"];
 
     const result = await User.aggregate([
       {
