@@ -40,3 +40,6 @@ mongoose
   .catch(() => {
     console.log("Connection failed!");
   });
+
+//exportar APP para uso em testes
+export default app;
