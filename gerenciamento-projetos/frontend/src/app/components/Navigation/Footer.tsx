@@ -13,7 +13,7 @@ function Footer() {
         py: 3, 
         px: 2, 
         mt: 'auto', 
-        backgroundColor: '#1E90FF',  // Black background
+        backgroundColor: '#272727',  // Black background
         color: 'white',  // White text color
       }}
     >
@@ -48,7 +48,7 @@ function Footer() {
         </Typography>
       </Container>
     </Box>
-    <Box sx={{ display: 'flex', justifyContent: 'center', backgroundColor: '#36454F', p:1 }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', backgroundColor: '#313c50', p:1 }}>
         <Typography 
           variant="body2" 
           align="center" 
