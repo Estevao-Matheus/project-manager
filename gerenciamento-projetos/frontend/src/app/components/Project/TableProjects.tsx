@@ -11,12 +11,11 @@ import { User } from '../../types/User';
 import { toast } from 'react-toastify';
 
 interface IProjectTable {
-   buttonShow?: boolean
+   buttonShow?: boolean;
 }
 
-const ProjectTable: React.FC <IProjectTable> = ( {buttonShow = true }) => {
+const ProjectTable: React.FC<IProjectTable> = ({ buttonShow = true }) => {
     const [projects, setProjects] = useState<Project[]>([]);
-    const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
     const [open, setOpen] = useState(false);
     const [openDeleteModal, setOpenDeleteModal] = useState(false);
     const [projectToDelete, setProjectToDelete] = useState<Project | null>(null);
@@ -35,10 +34,6 @@ const ProjectTable: React.FC <IProjectTable> = ( {buttonShow = true }) => {
         fetchUsers();
     }, [filters]); 
 
-    useEffect(() => {
-        applyFilters();
-    }, [projects, filters]);
-
     const fetchProjects = async () => {
         try {
             const query = new URLSearchParams({
@@ -52,7 +47,7 @@ const ProjectTable: React.FC <IProjectTable> = ( {buttonShow = true }) => {
             }).toString();
             
             const response = await axios.get<Project[]>(`http://localhost:3000/api/projects/paginated?${query}`);
-            setProjects(response.data.projects);
+            setProjects(response.data.projects); 
         } catch (error) {
             console.error('Failed to fetch projects:', error);
         }
@@ -65,37 +60,6 @@ const ProjectTable: React.FC <IProjectTable> = ( {buttonShow = true }) => {
         } catch (error) {
             console.error('Failed to fetch users:', error);
         }
-    };
-
-    const applyFilters = () => {
-        let filtered = [...projects];
-
-        // Apply filters
-        if (filters.nome) {
-            filtered = filtered.filter((project) =>
-                project.nome.toLowerCase().includes(filters.nome.toLowerCase())
-            );
-        }
-
-        if (filters.dataInicio) {
-            filtered = filtered.filter((project) =>
-                new Date(project.data_inicio).toLocaleDateString('pt-BR') === new Date(filters.dataInicio).toLocaleDateString('pt-BR')
-            );
-        }
-
-        if (filters.dataFim) {
-            filtered = filtered.filter((project) =>
-                new Date(project.data_fim).toLocaleDateString('pt-BR') === new Date(filters.dataFim).toLocaleDateString('pt-BR')
-            );
-        }
-
-        if (filters.status) {
-            filtered = filtered.filter((project) =>
-                project.status.toLowerCase() === filters.status.toLowerCase()
-            );
-        }
-
-        setFilteredProjects(filtered);
     };
 
     const handleAddProject = () => {
@@ -164,12 +128,12 @@ const ProjectTable: React.FC <IProjectTable> = ( {buttonShow = true }) => {
 
     return (
         <Box sx={{ padding: 2 }}>
-             {buttonShow && (
-            <Button variant="contained" color="primary" onClick={handleAddProject} style={{ marginBottom: 16 }}>
-                Add Projeto
-            </Button>
-             )}
-            <Box display="flex"  gap={2} mb={2} sx={{width: {lg: '75vw', xl: '60vw'}}}>
+            {buttonShow && (
+                <Button variant="contained" color="primary" onClick={handleAddProject} style={{ marginBottom: 16 }}>
+                    Add Projeto
+                </Button>
+            )}
+            <Box display="flex" gap={2} mb={2} sx={{ width: { lg: '75vw', xl: '60vw' } }}>
                 <TextField
                     label="Nome"
                     variant="outlined"
@@ -219,9 +183,9 @@ const ProjectTable: React.FC <IProjectTable> = ( {buttonShow = true }) => {
                     ))}
                 </TextField>
             </Box>
-            <Box sx={{ width: { lg: '75vw', xl: '60vw'} }}>
+            <Box sx={{ width: { lg: '75vw', xl: '60vw' } }}>
                 <DataGrid
-                    rows={filteredProjects}
+                    rows={projects} // No need to use filteredProjects
                     columns={columns}
                     pageSize={10}
                     rowsPerPageOptions={[10]}
