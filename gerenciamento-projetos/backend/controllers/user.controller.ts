@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User, { IUser } from "../models/user.model"; // Assuming you have a user model with types
 import bcrypt from "bcrypt";
+import sanitizeHtml from 'sanitize-html'; // biblioteca pra exitar xss (Cross-Site Scripting)
 
 const maxAge = 3 * 24 * 60 * 60; // 3 days
 
@@ -48,7 +49,11 @@ const handleErrors = (err: ErrorWithCode) => {
 
 
 export const register = async (req: Request, res: Response): Promise<void> => {
-  const { nome, email, senha, papel } = req.body;
+  const sanitizedBody = Object.fromEntries(
+    Object.entries(req.body).map(([key, value]) => [key, sanitizeHtml(value as string)])
+  );
+
+  const { nome, email, senha, papel } = sanitizedBody;
 
   try {
     const user: IUser = await User.create({ nome, email, senha, papel });

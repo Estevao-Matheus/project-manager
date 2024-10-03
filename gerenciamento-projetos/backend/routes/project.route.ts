@@ -1,4 +1,5 @@
-import express, { Router, Request, Response } from "express";
+import express, { Router, Request, Response, NextFunction } from "express";
+import csrf from "csurf"; // Importando o csurf
 import {
   getProjects,
   getProject,
@@ -15,6 +16,8 @@ import {
 import { getProjectsByUser } from "../controllers/projectUser.controller";
 
 const router: Router = express.Router();
+
+const csrfProtection = csrf({ cookie: true }); // Middleware de proteção CSRF
 
 interface AddUserRequest extends Request {
   body: {
@@ -38,11 +41,12 @@ router.get('/paginated', (req: Request, res: Response) => getProjectsPaginated(r
 
 router.get("/status-count", getProjectsByStatus);
 
-router.get("/:id", (req: Request, res: Response) => getProject(req, res));
-
 router.put("/:id", (req: Request, res: Response) => updateProject(req, res));
 
 router.delete("/:id", (req: Request, res: Response) => deleteProject(req, res));
+
+// Aplicando a proteção CSRF apenas na rota getProject
+router.get("/:id", csrfProtection, getProject);
 
 router.post("/addUser", (req: AddUserRequest, res: Response) => addUserToProject(req, res));
 
@@ -51,6 +55,5 @@ router.post("/removeUser", (req: RemoveUserRequest, res: Response) => removeUser
 router.get("/:projetoId/usuarios", (req: Request, res: Response) => listUsersInProject(req, res));
 
 router.get("/:userId/projects", (req: Request, res: Response) => getProjectsByUser(req, res));
-
 
 export default router;

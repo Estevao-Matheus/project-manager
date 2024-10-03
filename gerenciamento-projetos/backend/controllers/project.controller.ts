@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import Project from "../models/project.model";
 import ProjetosUsuarios from "../models/projectUser.model";
 import ProjectUser from "../models/projectUser.model";
@@ -115,19 +115,21 @@ export const getProjectsPaginated = async (req: Request, res: Response): Promise
 
 
 
-export const getProject = async (req: Request, res: Response): Promise<void> => {
+export const getProject: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const { id } = req.params;
-
     const project = await Project.findById(id);
 
     if (!project) {
       res.status(404).json({ message: "Projeto não encontrado" });
       return;
     }
-    res.status(200).json(project);
+
+    // Generate CSRF token and include it in the response
+    const csrfToken = req.csrfToken();
+    res.status(200).json({ project, csrfToken });
   } catch (error: any) {
-    res.status(500).json({ message: error.message });
+    next(error); // Ensure the error is passed to next() for proper error handling
   }
 };
 
