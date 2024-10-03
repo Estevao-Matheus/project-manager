@@ -163,7 +163,10 @@ function ResponsiveAppBar({ open, handleSidebar }: AppBarProps) {
               onClose={handleCloseUserMenu}
             >
               <MenuItem key={'profile'} onClick={handleCloseUserMenu}>
-                <NavHeader name={user.nome} role={user.papel} withHeader= {false} />
+                <Typography sx={{ textAlign: 'center' }}>{user.nome}</Typography>
+               </MenuItem>
+                <MenuItem key={'email'} onClick={handleCloseUserMenu}> 
+                <Typography sx={{ textAlign: 'center' }}>{user.email}</Typography>
               </MenuItem>
                 <MenuItem key={'logout'} onClick={handleLogout}>
                   <Typography sx={{ textAlign: 'center' }}>Logout</Typography>
