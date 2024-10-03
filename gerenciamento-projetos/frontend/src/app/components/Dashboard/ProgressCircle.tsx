@@ -1,5 +1,6 @@
 import { Box, useTheme } from "@mui/material";
 import {tokens } from '../../theme';
+import useSanitize from "@/app/Hooks/useSanitize";
 
 
 interface IProgressCircleProps {
@@ -10,8 +11,12 @@ interface IProgressCircleProps {
 
 const ProgressCircle = ({ progress , size = 50	 }: IProgressCircleProps) => {
     const theme = useTheme();
-     const colors = tokens(theme.palette.mode);
+    const colors = tokens(theme.palette.mode);
     const angle = progress * 360;
+
+    //const { sanitize } = useSanitize();
+    //const sanitizedContent = sanitize(`<div>Your content with progress: ${progress}%</div>`); // sanitizar conteudo contra ataques XSS(CRoss-site Scripting)
+
     return (
       <Box
       sx={{

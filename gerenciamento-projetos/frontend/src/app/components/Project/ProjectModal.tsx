@@ -20,8 +20,8 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
     const [users, setUsers] = useState<User[]>([]);
     const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
     const [userOptions, setUserOptions] = useState<User[]>([]);
-    const [statusOptions, setStatusOptions] = useState<Array<'Em andamento' | 'Pendente' | 'Concluido'>>([
-        'Em andamento', 'Pendente', 'Concluido' ])
+    const [statusOptions, setStatusOptions] = useState<Array<'Em andamento' | 'Pendente' | 'Concluído'>>([
+        'Em andamento', 'Pendente', 'Concluído' ])
 
     // Validation states
     const [nomeError, setNomeError] = useState<string>('');
@@ -142,15 +142,19 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ open, handleClose, project 
         if (project) {
             const response = await axios.put(`http://localhost:3000/api/projects/${project._id}`, payload);
             toast.success( response.data.message || 'Projeto atualizado com sucesso!');
+            resetFields();
+
         } else {
            const response = await axios.post('http://localhost:3000/api/projects', payload);
             toast.success( response.data.message ||'Projeto adicionado com sucesso!');
+            resetFields();
         }
         handleClose();
     } catch (error) {
             const errorMessage = error.response?.data?.message || 'Falha ao excluir o projeto!';
             console.error('Failed to delete the project:', errorMessage);
             toast.error(errorMessage);
+            
         }
 };
 
